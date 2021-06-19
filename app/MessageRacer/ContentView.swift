@@ -7,46 +7,73 @@
 
 import SwiftUI
 
-enum MainRoute {
-    case login, signup, main
+/// Main Tree Navigation Routes
+public enum MainRoute {
+    case room(id: UUID), main
 }
 
 struct ContentView: View {
+    /// Route for Navigation
     @State
     var route: MainRoute = .main
     
     @StateObject
-    var user: User = User(with: "Vincent")
+    var user: User = User()
     
+    /// Get room id from the route, using case
+    var roomID: UUID? {
+        if case .room(let id) = route {
+            return id
+        }
+        return nil
+    }
+    
+    /// Allow to change the route so child component can programmatically, reroute navigation
     func navigate(to route: MainRoute) -> Void {
         withAnimation {
             self.route = route
         }
     }
     
+    /// Just a wrapper to move back to main used for Navigation Bar
+    func leaveRoom() -> Void {
+        withAnimation {
+            route = .main
+        }
+    }
     
     var body: some View {
         VStack {
-            NavView(user: user)
-            routing
+            // Navigation Bar
+            NavView(roomID: roomID, leaveRoom: leaveRoom)
+            
+            // Either room view or main view
+            content()
                 .environmentObject(user)
+        }
+        .onAppear {
+            route = user.isLoggedIn ? route : .main
         }
    }
     
-    var routing: some View {
+    @ViewBuilder func content() -> some View {
         switch route {
-        case .login:
-            return MainView(color: .blue, text: "Log In") {
-                navigate(to: .signup)
-            }
-        case .signup:
-            return MainView(color: .orange, text: "Sign Up") {
+        case .room(let id):
+            RoomView(
+                color: Color(UIColor.mediumPurple),
+                uuid: id
+            ) {
                 navigate(to: .main)
             }
+            .transition(.slide)
         case .main:
-            return MainView(color: .purple, text: "Main Page") {
-                navigate(to: .login)
+            MainView(
+                color: .purple,
+                text: "Main Page"
+            ) {
+                navigate(to: .room(id: UUID()))
             }
+            .transition(.slide)
         }
     }
 }

@@ -8,28 +8,35 @@
 import SwiftUI
 
 public struct NavView: View {
-    let user: User
+    let roomID: UUID?
+    let leaveRoom: () -> Void
     
     public var body: some View {
-        if (user.isLoggedIn) {
-            HStack(spacing: 10) {
-                Text("\(user.username)")
-                
-                Button {} label: {
-                    Text("Log out")
+        HStack(spacing: 10) {
+            Text("Message Racer")
+                .font(.headline)
+                .foregroundColor(.purple)
+            if let roomID = roomID {
+                Text("\(roomID)")
+                    .font(.system(size: 8, weight: .thin, design: .monospaced))
+                    .foregroundColor(.gray)
+                    .transition(.slide)
+                Spacer()
+                Button(action: leaveRoom) {
+                    Text("Leave")
                         .foregroundColor(.red)
+                        .transition(.scale)
                 }
+            } else {
                 Spacer()
             }
-            .padding(.horizontal, 20)
-        } else {
-            Text("Not logged in")
         }
+        .padding(.horizontal, 20)
     }
 }
 
 struct NavView_Previews: PreviewProvider {
     static var previews: some View {
-        NavView(user: User())
+        NavView(roomID: UUID()) {}
     }
 }

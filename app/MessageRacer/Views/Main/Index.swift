@@ -30,3 +30,9 @@ public struct MainView: View {
         }
     }
 }
+
+struct MainView_Preview: PreviewProvider {
+    static var previews: some View {
+        MainView(color: .red, text: "Hello World", onPress: { print("a") }).environmentObject(User())
+    }
+}
