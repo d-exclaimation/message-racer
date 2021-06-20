@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ChatMessage: View {
     @Environment(\.colorScheme) var colorScheme
+    let fontColor: Color
     let content: String
     let date: Date
     let alignment: HorizontalAlignment
@@ -16,10 +17,12 @@ struct ChatMessage: View {
     let user: String
     let color: Color
     
-    init(content: String, date: Date, isUser: Bool, user: String) {
+    init(content: String, date: Date, isUser: Bool, user: String, fontColor: Color? = nil) {
         self.content = content
         self.date = date
         self.user = user
+        
+        self.fontColor = fontColor ?? Color.black
         
         // Assign conditional properties
         color = isUser ? Color(UIColor.lavender) : Color(UIColor.white)
@@ -64,8 +67,10 @@ struct ChatMessage: View {
         VStack(alignment: alignment) {
             Text("\(user)")
                 .font(.caption)
+                .foregroundColor(.black)
             Text(content)
                 .font(.headline)
+                .foregroundColor(fontColor)
                 .bold()
         }
         .bubbleCarded(

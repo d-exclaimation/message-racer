@@ -62,9 +62,7 @@ struct ContentView: View {
             RoomView(
                 color: Color(UIColor.mediumPurple),
                 uuid: id
-            ) {
-                navigate(to: .main)
-            }
+            )
             .transition(.slide)
         case .main:
             MainView(
