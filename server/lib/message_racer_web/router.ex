@@ -5,8 +5,10 @@ defmodule MessageRacerWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", MessageRacerWeb do
+  scope "/" do
     pipe_through :api
+
+    forward "/graphql", Absinthe.Plug, schema: MessageRacerWeb.Schema
   end
 
   # Enables LiveDashboard only for development

@@ -14,7 +14,8 @@ defmodule MessageRacer.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: MessageRacer.PubSub},
       # Start the Endpoint (http/https)
-      MessageRacerWeb.Endpoint
+      MessageRacerWeb.Endpoint,
+      {Absinthe.Subscription, MessageRacerWeb.Endpoint}
       # Start a worker by calling: MessageRacer.Worker.start_link(arg)
       # {MessageRacer.Worker, arg}
     ]

@@ -1,14 +1,21 @@
 defmodule MessageRacerWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :message_racer
-
+  use Absinthe.Phoenix.Endpoint
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
     key: "_message_racer_key",
-    signing_salt: "xMniNl3P"
+    signing_salt: "xMniNl3P",
+    http_only: true,
+    same_site: if(Mix.env() == :dev, do: "none", else: "lax")
   ]
+
+  socket "/subscription", MessageRacerWeb.GraphqlSocket,
+    websocket: [
+      subprotocols: ["graphql-ws"]
+    ]
 
   socket "/socket", MessageRacerWeb.UserSocket,
     websocket: true,
@@ -41,9 +48,13 @@ defmodule MessageRacerWeb.Endpoint do
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
   plug Plug.Parsers,
-    parsers: [:urlencoded, :multipart, :json],
+    parsers: [:urlencoded, :multipart, :json, Absinthe.Plug.Parser],
     pass: ["*/*"],
     json_decoder: Phoenix.json_library()
+
+  if Mix.env() in [:dev, :test] do
+    plug CORSPlug
+  end
 
   plug Plug.MethodOverride
   plug Plug.Head
