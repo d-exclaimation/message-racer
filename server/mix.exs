@@ -45,7 +45,8 @@ defmodule MessageRacer.MixProject do
       {:absinthe, "~> 1.5"},
       {:absinthe_phoenix, "~> 2.0"},
       {:subscriptions_transport_ws, "~> 1.0"},
-      {:cors_plug, "~> 2.0"}
+      {:cors_plug, "~> 2.0"},
+      {:dataloader, "~> 1.0.0"}
     ]
   end
 
