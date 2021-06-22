@@ -1,14 +1,18 @@
 defmodule MessageRacerWeb.Router do
   use MessageRacerWeb, :router
+  alias Absinthe.Blueprint
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug MessageRacerWeb.Plug.Auth
   end
 
   scope "/" do
     pipe_through :api
 
-    forward "/graphql", Absinthe.Plug, schema: MessageRacerWeb.Schema
+    forward "/graphql", Absinthe.Plug,
+      schema: MessageRacerWeb.Schema,
+      before_send: {__MODULE__, :session_auth}
   end
 
   # Enables LiveDashboard only for development
@@ -26,4 +30,16 @@ defmodule MessageRacerWeb.Router do
       live_dashboard "/dashboard", metrics: MessageRacerWeb.Telemetry
     end
   end
+
+  @spec session_auth(Plug.Conn.t(), Absinthe.Blueprint.t()) :: Plug.Conn.t()
+  def session_auth(
+        conn,
+        %Blueprint{execution: %Blueprint.Execution{context: %{session_id: id}}}
+      ) do
+    conn
+    |> fetch_session()
+    |> put_session(:user_id, id)
+  end
+
+  def session_auth(conn, _blueprint), do: conn
 end

@@ -10,11 +10,15 @@ defmodule MessageRacer.PlayerMutations do
   Mutation related to Players
   """
   alias MessageRacer.Race.Player
+  alias MessageRacer.Repo
 
   @doc """
+  Create a player and assign them to a room
   """
   @spec create_player(Ecto.UUID.t(), map()) :: {:ok, %Player{}} | {:error, Ecto.Changeset.t()}
   def create_player(room_id, %{username: username}) do
-    {:ok, %Player{id: "peepee", room_id: room_id, username: username}}
+    %Player{room_id: room_id}
+    |> Player.changeset(%{"username" => username})
+    |> Repo.insert()
   end
 end

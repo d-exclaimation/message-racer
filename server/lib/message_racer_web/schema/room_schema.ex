@@ -17,10 +17,29 @@ defmodule MessageRacerWeb.RoomSchema do
 
   @desc "Room Object type"
   object :room do
+    @desc "Identifier"
     field :id, non_null(:id)
 
+    @desc "Players joined in this room"
     field :players, non_null(list_of(non_null(:player))) do
       resolve(dataloader(PlayerLoader, :players, []))
     end
+  end
+
+  input_object :game_change do
+    field :room_id, non_null(:id)
+    field :username, non_null(:string)
+    field :changes, non_null(:changes)
+  end
+
+  input_object :changes do
+    field :type, non_null(:changes_type)
+    field :index, non_null(:integer)
+    field :word, non_null(:string)
+  end
+
+  enum :changes_type do
+    value(:forward, as: "forward")
+    value(:backward, as: "backward")
   end
 end

@@ -23,7 +23,7 @@ defmodule MessageRacer.PlayerLoader do
   @doc """
   Fetch batch of data
   """
-  @spec fetch(atom(), [map() | %Room{}]) :: %{map() => [%Player{}]}
+  @spec fetch({atom(), map()}, [map() | %Room{}]) :: %{%Room{} => [%Player{}]}
   def fetch({:players, %{}}, [%{}]) do
     %{
       %{} => PlayerQueries.all([])
@@ -39,7 +39,14 @@ defmodule MessageRacer.PlayerLoader do
     args
     |> Enum.reduce(%{}, fn
       %Room{id: room_id} = arg, prev ->
-        prev |> Map.put(arg, Enum.filter(all_players, fn x -> x.id == room_id end))
+        prev
+        |> Map.put(
+          arg,
+          all_players
+          |> Enum.filter(fn x ->
+            x.room_id == room_id
+          end)
+        )
 
       arg, prev ->
         prev |> Map.put(arg, [])

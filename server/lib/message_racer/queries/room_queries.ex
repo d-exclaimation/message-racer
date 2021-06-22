@@ -34,4 +34,16 @@ defmodule MessageRacer.RoomQueries do
     Room
     |> Repo.get(id)
   end
+
+  @doc """
+  All within the id eet
+  """
+  @spec all_within([Ecto.UUID.t()]) :: [%Room{}]
+  def all_within(ids) do
+    from(
+      room in Room,
+      where: room.id in ^ids
+    )
+    |> Repo.all()
+  end
 end

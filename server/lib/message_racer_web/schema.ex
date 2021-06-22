@@ -9,7 +9,7 @@ defmodule MessageRacerWeb.Schema do
   @moduledoc """
   Root Schema
   """
-  alias MessageRacer.PlayerLoader
+  alias MessageRacer.{PlayerLoader, RoomLoader}
   use Absinthe.Schema
 
   import_types(MessageRacerWeb.RoomResolver)
@@ -26,6 +26,7 @@ defmodule MessageRacerWeb.Schema do
     loader =
       Dataloader.new()
       |> Dataloader.add_source(PlayerLoader, PlayerLoader.data())
+      |> Dataloader.add_source(RoomLoader, RoomLoader.data())
 
     Map.put(ctx, :loader, loader)
   end

@@ -24,4 +24,13 @@ defmodule MessageRacer.PlayerQueries do
     )
     |> Repo.all()
   end
+
+  @doc """
+  Get one player by id
+  """
+  @spec get_by_id(Ecto.UUID.t()) :: %Player{} | nil
+  def get_by_id(id) do
+    Player
+    |> Repo.get(id)
+  end
 end

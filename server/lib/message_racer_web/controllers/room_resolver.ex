@@ -24,10 +24,27 @@ defmodule MessageRacerWeb.RoomResolver do
     end
 
     @desc "Join a room with a player information"
-    field :join_room, :player do
+    field :join_room, non_null(:player) do
       arg(:user_info, non_null(:join_input))
       arg(:room_id, non_null(:id))
       resolve(&join_room/2)
+
+      # Setup for session auth
+      middleware(&setup_auth/2)
+    end
+
+    @desc ""
+    field :send, :player do
+      arg(:movement, non_null(:game_change))
+
+      # TODO: Connect to client and set up subscription
+
+      aaaaaaaaaaaaaaaaaaaaaaaaaa(fix(me))
+
+      resolve(fn %{movement: m}, %{context: ctx} ->
+        IO.inspect(m)
+        {:ok, Map.get(ctx, :user)}
+      end)
     end
   end
 
@@ -81,4 +98,13 @@ defmodule MessageRacerWeb.RoomResolver do
   end
 
   def available_rooms(_args, _res), do: "Required parameter last not given" |> error()
+
+  # Add session to context, to be fetch in the Blueprint
+  @spec setup_auth(Absinthe.Resolution.t(), any()) :: Absinthe.Resolution.t()
+  defp setup_auth(%Absinthe.Resolution{value: %Player{id: id}} = res, _conf) do
+    res
+    |> Map.update(:context, %{}, &Map.merge(&1, %{session_id: id}))
+  end
+
+  defp setup_auth(res, _conf), do: res
 end
