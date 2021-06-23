@@ -10,16 +10,15 @@ defmodule MessageRacerWeb.RoomResolver do
   Room GraphQL Resolver
   """
   use Absinthe.Schema.Notation
+  import MessageRacerWeb.Graph, only: [ok: 1, error: 1]
   alias MessageRacer.Race.{Room, Player}
   alias MessageRacer.{RoomMutations, RoomQueries, PlayerMutations}
   alias MessageRacerWeb.{Graph, Event}
-  alias Absinthe.Subscription
-  import MessageRacerWeb.Graph, only: [ok: 1, error: 1]
-
-  @type game_event :: Event.Delta.t() | Event.End.t() | Event.Join.t() | Event.Start.t()
 
   import_types(MessageRacerWeb.RoomSchema)
   import_types(MessageRacerWeb.GameSchema)
+
+  @type game_event :: Event.Delta.t() | Event.End.t() | Event.Join.t() | Event.Start.t()
 
   object :room_mutations do
     @desc "Create a new room"
@@ -59,7 +58,7 @@ defmodule MessageRacerWeb.RoomResolver do
       arg(:room_id, non_null(:id))
       config(fn %{room_id: room_id}, _ -> {:ok, topic: room_id} end)
 
-      # TODO: Contempplating splitting into a couple subscriptions, but that might be expensive, need to check whether client can batch websockets together
+      # TODO: Contemplating splitting into a couple subscriptions, but that might be expensive, need to check whether client can batch websockets together
       resolve(&game_cycle/3)
     end
   end
@@ -74,27 +73,21 @@ defmodule MessageRacerWeb.RoomResolver do
           context: _ctx
         }
       ) do
-    Subscription.publish(
-      MessageRacerWeb.Endpoint,
+    Graph.dispatch(
       %Event.Delta{index: i, word: word, username: username, type: :delta},
       game_cycle: id
     )
 
-    true
-    |> ok()
+    true |> ok()
   end
 
-  def send_changes(_args, _res) do
-    false |> ok()
-  end
+  def send_changes(_args, _res), do: false |> ok()
 
   @doc """
   Game cycle subscriptions
   """
   @spec game_cycle(map(), map(), Absinthe.Resolution.t()) :: Graph.returned(game_event())
-  def game_cycle(p, _, _) do
-    p |> ok()
-  end
+  def game_cycle(p, _, _), do: p |> ok()
 
   @doc """
   Create room resolver
@@ -121,8 +114,7 @@ defmodule MessageRacerWeb.RoomResolver do
   def join_room(%{user_info: info, room_id: id}, _res) do
     with {:ok, uuid} <- Ecto.UUID.cast(id),
          {:ok, %Player{username: username} = user} <- PlayerMutations.create_player(uuid, info) do
-      Subscription.publish(
-        MessageRacerWeb.Endpoint,
+      Graph.dispatch(
         %Event.Join{type: :join, username: username},
         game_cycle: uuid
       )

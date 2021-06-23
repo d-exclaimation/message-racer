@@ -26,14 +26,21 @@ defmodule MessageRacerWeb.RoomSchema do
     end
   end
 
+  @desc "Unvalidated changes input"
   input_object :delta_input do
+    @desc "Room ID to sent this to"
     field :room_id, non_null(:id)
+    @desc "Identification"
     field :username, non_null(:string)
+    @desc "Changes candidate"
     field :changes, non_null(:changes)
   end
 
+  @desc "Changes candidate"
   input_object :changes do
+    @desc "Index currently on"
     field :index, non_null(:integer)
+    @desc "Word currently on"
     field :word, non_null(:string)
   end
 end
