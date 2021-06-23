@@ -1,0 +1,20 @@
+subscription RoomSubscription($joinRoomRoomId: ID!) {
+  gameCycle(roomId: $joinRoomRoomId) {
+    ... on DeltaEvent {
+      index
+      type
+      username
+      word
+    }
+    ... on EndEvent {
+      type
+    }
+    ... on JoinEvent {
+      type
+      username
+    }
+    ... on StartEvent {
+      type
+    }
+  }
+}

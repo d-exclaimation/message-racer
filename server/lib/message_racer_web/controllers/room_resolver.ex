@@ -12,14 +12,19 @@ defmodule MessageRacerWeb.RoomResolver do
   use Absinthe.Schema.Notation
   alias MessageRacer.Race.{Room, Player}
   alias MessageRacer.{RoomMutations, RoomQueries, PlayerMutations}
-  alias MessageRacerWeb.Graph
+  alias MessageRacerWeb.{Graph, Event}
+  alias Absinthe.Subscription
   import MessageRacerWeb.Graph, only: [ok: 1, error: 1]
 
+  @type game_event :: Event.Delta.t() | Event.End.t() | Event.Join.t() | Event.Start.t()
+
   import_types(MessageRacerWeb.RoomSchema)
+  import_types(MessageRacerWeb.GameSchema)
 
   object :room_mutations do
     @desc "Create a new room"
     field :create_room, :room do
+      arg(:user_info, non_null(:join_input))
       resolve(&create_room/2)
     end
 
@@ -33,18 +38,10 @@ defmodule MessageRacerWeb.RoomResolver do
       middleware(&setup_auth/2)
     end
 
-    @desc ""
-    field :send, :player do
-      arg(:movement, non_null(:game_change))
-
-      # TODO: Connect to client and set up subscription
-
-      aaaaaaaaaaaaaaaaaaaaaaaaaa(fix(me))
-
-      resolve(fn %{movement: m}, %{context: ctx} ->
-        IO.inspect(m)
-        {:ok, Map.get(ctx, :user)}
-      end)
+    @desc "Send delta event"
+    field :send_delta, :boolean do
+      arg(:delta, non_null(:delta_input))
+      resolve(&send_changes/2)
     end
   end
 
@@ -54,6 +51,49 @@ defmodule MessageRacerWeb.RoomResolver do
       arg(:last, non_null(:integer))
       resolve(&available_rooms/2)
     end
+  end
+
+  object :room_subscriptions do
+    @desc "Game cycle update"
+    field :game_cycle, non_null(:game_event) do
+      arg(:room_id, non_null(:id))
+      config(fn %{room_id: room_id}, _ -> {:ok, topic: room_id} end)
+
+      # TODO: Contempplating splitting into a couple subscriptions, but that might be expensive, need to check whether client can batch websockets together
+      resolve(&game_cycle/3)
+    end
+  end
+
+  @doc """
+  Send game changes
+  """
+  @spec send_changes(%{delta: map()}, Absinthe.Resolution.t()) :: Graph.returned(boolean())
+  def send_changes(
+        %{delta: %{changes: %{index: i, word: word}, room_id: id, username: username}},
+        %Absinthe.Resolution{
+          context: _ctx
+        }
+      ) do
+    Subscription.publish(
+      MessageRacerWeb.Endpoint,
+      %Event.Delta{index: i, word: word, username: username, type: :delta},
+      game_cycle: id
+    )
+
+    true
+    |> ok()
+  end
+
+  def send_changes(_args, _res) do
+    false |> ok()
+  end
+
+  @doc """
+  Game cycle subscriptions
+  """
+  @spec game_cycle(map(), map(), Absinthe.Resolution.t()) :: Graph.returned(game_event())
+  def game_cycle(p, _, _) do
+    p |> ok()
   end
 
   @doc """
@@ -80,7 +120,14 @@ defmodule MessageRacerWeb.RoomResolver do
           Graph.returned(%Player{})
   def join_room(%{user_info: info, room_id: id}, _res) do
     with {:ok, uuid} <- Ecto.UUID.cast(id),
-         {:ok, user} <- PlayerMutations.create_player(uuid, info) do
+         {:ok, %Player{username: username} = user} <- PlayerMutations.create_player(uuid, info) do
+      Subscription.publish(
+        MessageRacerWeb.Endpoint,
+        %Event.Join{type: :join, username: username},
+        game_cycle: uuid
+      )
+
+      # TODO: Give all initial info here
       user |> ok()
     else
       _ -> "Cannot find room" |> error()

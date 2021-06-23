@@ -26,20 +26,14 @@ defmodule MessageRacerWeb.RoomSchema do
     end
   end
 
-  input_object :game_change do
+  input_object :delta_input do
     field :room_id, non_null(:id)
     field :username, non_null(:string)
     field :changes, non_null(:changes)
   end
 
   input_object :changes do
-    field :type, non_null(:changes_type)
     field :index, non_null(:integer)
     field :word, non_null(:string)
-  end
-
-  enum :changes_type do
-    value(:forward, as: "forward")
-    value(:backward, as: "backward")
   end
 end

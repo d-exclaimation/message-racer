@@ -22,6 +22,10 @@ defmodule MessageRacerWeb.Schema do
     import_fields(:room_mutations)
   end
 
+  subscription do
+    import_fields(:room_subscriptions)
+  end
+
   def context(ctx) do
     loader =
       Dataloader.new()
