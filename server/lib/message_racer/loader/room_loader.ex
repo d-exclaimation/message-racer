@@ -23,7 +23,7 @@ defmodule MessageRacer.RoomLoader do
   @doc """
   Fetch correct room
   """
-  @spec fetch({atom(), map()}, [map() | %Player{}]) :: %{%Player{} => %Room{}}
+  @spec fetch({atom(), map()}, [map() | Player.t()]) :: %{Player.t() => Room.t()}
   def fetch({:room, %{}}, [%{}]) do
     %{
       %{} => nil

@@ -23,7 +23,7 @@ defmodule MessageRacer.PlayerLoader do
   @doc """
   Fetch batch of data
   """
-  @spec fetch({atom(), map()}, [map() | %Room{}]) :: %{%Room{} => [%Player{}]}
+  @spec fetch({atom(), map()}, [map() | Room.t()]) :: %{Room.t() => [Player.t()]}
   def fetch({:players, %{}}, [%{}]) do
     %{
       %{} => PlayerQueries.all([])

@@ -10,10 +10,23 @@ defmodule MessageRacerWeb.Graph do
   Schema tools
   """
   alias Absinthe.Subscription
-  alias MessageRacerWeb.Endpoint
 
+  @typedoc """
+  Absinthe GraphQL Returned types of valid or error
+  """
   @type returned(t) :: {:ok, t} | {:error, String.t()}
-  @type subscription_key :: {atom, term | (term -> term)}
+
+  @typedoc """
+  Subscription compound key of (field <> topic_id)
+  """
+  @type subscription_keys :: [{atom, term | (term -> term)}]
+
+  @typedoc """
+  Data payload
+  """
+  @type payload :: struct() | map()
+
+  @endpoint MessageRacerWeb.Endpoint
 
   @doc """
   Ok tuple with payload
@@ -35,8 +48,8 @@ defmodule MessageRacerWeb.Graph do
   def ok_else(payload, _fallback), do: {:ok, payload}
 
   @doc """
-  Dispatch to a subscription endpoint
+  Dispatch a payload to subscription(s)
   """
-  @spec dispatch(struct() | map(), subscription_key() | Absinthe.Resolution.t()) :: :ok
-  def dispatch(payload, opts), do: Subscription.publish(Endpoint, payload, opts)
+  @spec dispatch(payload(), subscription_keys() | Absinthe.Resolution.t()) :: :ok
+  def dispatch(payload, opts), do: Subscription.publish(@endpoint, payload, opts)
 end

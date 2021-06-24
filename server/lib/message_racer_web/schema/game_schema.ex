@@ -10,15 +10,14 @@ defmodule MessageRacerWeb.GameSchema do
   Game Event Schema
   """
   use Absinthe.Schema.Notation
-  alias MessageRacerWeb.Event.{Delta, Join, Start, End}
+  alias MessageRacerWeb.Event.{Delta, Start, End}
 
   @desc "A game event"
   union :game_event do
-    types([:end_event, :delta_event, :join_event, :start_event])
+    types([:end_event, :delta_event, :start_event])
 
     resolve_type(fn
       %Delta{}, _ -> :delta_event
-      %Join{}, _ -> :join_event
       %Start{}, _ -> :start_event
       %End{}, _ -> :end_event
     end)
@@ -37,12 +36,6 @@ defmodule MessageRacerWeb.GameSchema do
     field :word, non_null(:string)
   end
 
-  @desc "Event to add new players"
-  object :join_event do
-    field :type, non_null(:event_type)
-    field :username, non_null(:string)
-  end
-
   @desc "Event to trigger start for each player"
   object :start_event do
     field :type, non_null(:event_type)
@@ -51,5 +44,5 @@ defmodule MessageRacerWeb.GameSchema do
   end
 
   @desc "Event type"
-  enum(:event_type, values: [:end, :join, :start, :delta])
+  enum(:event_type, values: [:end, :start, :delta])
 end

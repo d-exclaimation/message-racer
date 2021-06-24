@@ -11,14 +11,16 @@ defmodule MessageRacerWeb.RoomResolver do
   """
   use Absinthe.Schema.Notation
   import MessageRacerWeb.Graph, only: [ok: 1, error: 1]
-  alias MessageRacer.Race.{Room, Player}
-  alias MessageRacer.{RoomMutations, RoomQueries, PlayerMutations}
+  alias Absinthe.Resolution, as: Res
+  alias MessageRacer.{RoomMutations, RoomQueries, PlayerMutations, Race}
+  alias Race.{Room, Player}
   alias MessageRacerWeb.{Graph, Event}
+  alias Event.{Delta, Join, Start, End}
 
   import_types(MessageRacerWeb.RoomSchema)
   import_types(MessageRacerWeb.GameSchema)
 
-  @type game_event :: Event.Delta.t() | Event.End.t() | Event.Join.t() | Event.Start.t()
+  @type game_event :: Delta.t() | End.t() | Join.t() | Start.t()
 
   object :room_mutations do
     @desc "Create a new room"
@@ -58,7 +60,7 @@ defmodule MessageRacerWeb.RoomResolver do
       arg(:room_id, non_null(:id))
       config(fn %{room_id: room_id}, _ -> {:ok, topic: room_id} end)
 
-      # TODO: Contemplating splitting into a couple subscriptions, but that might be expensive, need to check whether client can batch websockets together
+      # TODO: Planning to remove join event, this will remove join animation but will solve syncing and union issues for subscriptions
       resolve(&game_cycle/3)
     end
   end
@@ -66,17 +68,13 @@ defmodule MessageRacerWeb.RoomResolver do
   @doc """
   Send game changes
   """
-  @spec send_changes(%{delta: map()}, Absinthe.Resolution.t()) :: Graph.returned(boolean())
+  @spec send_changes(%{delta: map()}, Res.t()) :: Graph.returned(boolean())
   def send_changes(
         %{delta: %{changes: %{index: i, word: word}, room_id: id, username: username}},
-        %Absinthe.Resolution{
-          context: _ctx
-        }
+        %Res{context: _ctx}
       ) do
-    Graph.dispatch(
-      %Event.Delta{index: i, word: word, username: username, type: :delta},
-      game_cycle: id
-    )
+    payload = %Delta{index: i, word: word, username: username, type: :delta}
+    Graph.dispatch(payload, game_cycle: id)
 
     true |> ok()
   end
@@ -86,13 +84,13 @@ defmodule MessageRacerWeb.RoomResolver do
   @doc """
   Game cycle subscriptions
   """
-  @spec game_cycle(map(), map(), Absinthe.Resolution.t()) :: Graph.returned(game_event())
+  @spec game_cycle(map(), map(), Res.t()) :: Graph.returned(game_event())
   def game_cycle(p, _, _), do: p |> ok()
 
   @doc """
   Create room resolver
   """
-  @spec create_room(map(), Absinthe.Resolution.t()) :: Graph.returned(%Room{})
+  @spec create_room(map(), Res.t()) :: Graph.returned(Room.t())
   def create_room(_args, _res) do
     case RoomMutations.create(%{}) do
       {:ok, %Room{} = room} ->
@@ -109,27 +107,29 @@ defmodule MessageRacerWeb.RoomResolver do
   @doc """
   Join room
   """
-  @spec join_room(%{user_info: map(), room_id: String.t()}, Absinthe.Resolution.t()) ::
-          Graph.returned(%Player{})
+  @spec join_room(%{user_info: map(), room_id: String.t()}, Res.t()) :: Graph.returned(Player.t())
   def join_room(%{user_info: info, room_id: id}, _res) do
     with {:ok, uuid} <- Ecto.UUID.cast(id),
-         {:ok, %Player{username: username} = user} <- PlayerMutations.create_player(uuid, info) do
-      Graph.dispatch(
-        %Event.Join{type: :join, username: username},
-        game_cycle: uuid
-      )
+         {:ok, players} <- RoomMutations.increment_count(uuid),
+         {:ok, %Player{} = user} <- PlayerMutations.create_player(uuid, info) do
+      if players == 4 do
+        Timing.timeout(2000, fn ->
+          Graph.dispatch(%Start{type: :start}, game_cycle: id)
+        end)
+      end
 
-      # TODO: Give all initial info here
       user |> ok()
     else
-      _ -> "Cannot find room" |> error()
+      :error -> "Invalid UUID" |> error()
+      {:error, %Ecto.Changeset{errors: err}} -> inspect(err) |> error()
+      _ -> "Cannot find room or room is full" |> error()
     end
   end
 
   @doc """
   Query all available rooms
   """
-  @spec available_rooms(map(), Absinthe.Resolution.t()) :: Graph.returned([%Room{}])
+  @spec available_rooms(map(), Res.t()) :: Graph.returned([Room.t()])
   def available_rooms(%{last: last}, _res) do
     last
     |> RoomQueries.available()
@@ -139,8 +139,8 @@ defmodule MessageRacerWeb.RoomResolver do
   def available_rooms(_args, _res), do: "Required parameter last not given" |> error()
 
   # Add session to context, to be fetch in the Blueprint
-  @spec setup_auth(Absinthe.Resolution.t(), any()) :: Absinthe.Resolution.t()
-  defp setup_auth(%Absinthe.Resolution{value: %Player{id: id}} = res, _conf) do
+  @spec setup_auth(Res.t(), any()) :: Res.t()
+  defp setup_auth(%Res{value: %Player{id: id}} = res, _conf) do
     res
     |> Map.update(:context, %{}, &Map.merge(&1, %{session_id: id}))
   end

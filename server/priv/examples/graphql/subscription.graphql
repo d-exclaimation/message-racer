@@ -1,5 +1,5 @@
-subscription RoomSubscription($joinRoomRoomId: ID!) {
-  gameCycle(roomId: $joinRoomRoomId) {
+subscription RoomSubscription($id: ID!) {
+  gameCycle(roomId: $id) {
     ... on DeltaEvent {
       index
       type
@@ -8,10 +8,6 @@ subscription RoomSubscription($joinRoomRoomId: ID!) {
     }
     ... on EndEvent {
       type
-    }
-    ... on JoinEvent {
-      type
-      username
     }
     ... on StartEvent {
       type

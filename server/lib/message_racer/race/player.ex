@@ -11,6 +11,11 @@ defmodule MessageRacer.Race.Player do
     timestamps()
   end
 
+  @typedoc """
+  Player Struct Type
+  """
+  @type t() :: %__MODULE__{}
+
   @doc false
   def changeset(player, attrs) do
     player
