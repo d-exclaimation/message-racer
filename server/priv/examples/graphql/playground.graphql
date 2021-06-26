@@ -1,0 +1,38 @@
+mutation JoinRoom($id: ID!) {
+  joinRoom(roomId: $id, userInfo: { username: "d" }) {
+    id
+    username
+  }
+}
+mutation SendChanges($id: ID!) {
+  sendDelta(
+    delta: {
+      roomId: $id
+      username: "d"
+      changes: { index: 10, word: "Ameliorated bifurcated data-warehouse" }
+    }
+  )
+}
+mutation CreateRoom {
+  createRoom(userInfo: { username: "vincent" }) {
+    id
+  }
+}
+subscription RoomSubscription($id: ID!) {
+  gameCycle(roomId: $id) {
+    ... on DeltaEvent {
+      index
+      type
+      username
+      word
+    }
+    ... on EndEvent {
+      type
+      winner
+    }
+    ... on StartEvent {
+      type
+      payload
+    }
+  }
+}

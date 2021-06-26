@@ -12,15 +12,15 @@ defmodule MessageRacerWeb.RoomResolver do
   use Absinthe.Schema.Notation
   import MessageRacerWeb.Graph, only: [ok: 1, error: 1]
   alias Absinthe.Resolution, as: Res
-  alias MessageRacer.{RoomMutations, RoomQueries, PlayerMutations, Race}
+  alias MessageRacer.{RoomMutations, RoomQueries, PlayerMutations, Race, InMemory}
   alias Race.{Room, Player}
   alias MessageRacerWeb.{Graph, Event}
-  alias Event.{Delta, Join, Start, End}
+  alias Event.{Delta, Start, End}
 
   import_types(MessageRacerWeb.RoomSchema)
   import_types(MessageRacerWeb.GameSchema)
 
-  @type game_event :: Delta.t() | End.t() | Join.t() | Start.t()
+  @type game_event :: Delta.t() | End.t() | Start.t()
 
   object :room_mutations do
     @desc "Create a new room"
@@ -60,7 +60,6 @@ defmodule MessageRacerWeb.RoomResolver do
       arg(:room_id, non_null(:id))
       config(fn %{room_id: room_id}, _ -> {:ok, topic: room_id} end)
 
-      # TODO: Planning to remove join event, this will remove join animation but will solve syncing and union issues for subscriptions
       resolve(&game_cycle/3)
     end
   end
@@ -71,12 +70,37 @@ defmodule MessageRacerWeb.RoomResolver do
   @spec send_changes(%{delta: map()}, Res.t()) :: Graph.returned(boolean())
   def send_changes(
         %{delta: %{changes: %{index: i, word: word}, room_id: id, username: username}},
-        %Res{context: _ctx}
-      ) do
-    payload = %Delta{index: i, word: word, username: username, type: :delta}
-    Graph.dispatch(payload, game_cycle: id)
+        %Res{context: %{user: %Player{username: playername}}}
+      )
+      when playername == username do
+    # Check to InMemory State, to whether it is correct, fail or a winner is found
+    case InMemory.validate(id, i, word) do
+      # If pass, just broadcast / dispatch to all client
+      "pass" ->
+        Graph.dispatch(
+          %Delta{index: i, word: word, username: username, type: :delta},
+          game_cycle: id
+        )
 
-    true |> ok()
+        true |> ok()
+
+      "end" ->
+        # If a winner is found, then clear room as the game is over
+        with {:ok, uuid} <- Ecto.UUID.cast(id),
+             {:ok, %Room{}} <- RoomMutations.clear_room(uuid) do
+          Graph.dispatch(
+            %End{type: :end, winner: playername},
+            game_cycle: id
+          )
+
+          true |> ok()
+        else
+          _ -> false |> ok()
+        end
+
+      _ ->
+        false |> ok()
+    end
   end
 
   def send_changes(_args, _res), do: false |> ok()
@@ -112,9 +136,11 @@ defmodule MessageRacerWeb.RoomResolver do
     with {:ok, uuid} <- Ecto.UUID.cast(id),
          {:ok, players} <- RoomMutations.increment_count(uuid),
          {:ok, %Player{} = user} <- PlayerMutations.create_player(uuid, info) do
+      # Only send start event once there are 4 players
       if players == 4 do
-        Timing.timeout(2000, fn ->
-          Graph.dispatch(%Start{type: :start}, game_cycle: id)
+        Timing.async_timeout(2000, fn ->
+          payload = InMemory.start(id)
+          Graph.dispatch(%Start{type: :start, payload: payload}, game_cycle: id)
         end)
       end
 

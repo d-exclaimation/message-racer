@@ -25,7 +25,6 @@ defmodule MessageRacerWeb.Plug.Auth do
   """
   @spec call(Plug.Conn.t(), any()) :: Plug.Conn.t()
   def call(conn, _) do
-    # Absinthe.Plug.put_options(conn, context: context)
     res =
       conn
       |> fetch_session()
@@ -36,8 +35,10 @@ defmodule MessageRacerWeb.Plug.Auth do
         conn
 
       user_id ->
+        ctx = %{user: PlayerQueries.get_by_id(user_id)}
+
         conn
-        |> Absinthe.Plug.put_options(context: %{user: PlayerQueries.get_by_id(user_id)})
+        |> Absinthe.Plug.put_options(context: ctx)
     end
   end
 end

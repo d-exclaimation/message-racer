@@ -9,8 +9,11 @@ defmodule MessageRacerWeb.Event.End do
   @moduledoc """
   End Game Event
   """
-  @enforce_keys [:type]
-  defstruct [:type]
+  @enforce_keys [:type, :winner]
+  defstruct [
+    :type,
+    :winner
+  ]
 
   @typedoc """
   EndEvent Struct Type

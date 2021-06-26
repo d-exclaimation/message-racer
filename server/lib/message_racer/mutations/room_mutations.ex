@@ -14,7 +14,7 @@ defmodule MessageRacer.RoomMutations do
   @doc """
   Create a new room
   """
-  @spec create(map()) :: {:ok, %Room{}} | {:error, Ecto.Changeset.t()}
+  @spec create(map()) :: {:ok, Room.t()} | {:error, Ecto.Changeset.t()}
   def create(room_attr) do
     res =
       %Room{}
@@ -31,11 +31,25 @@ defmodule MessageRacer.RoomMutations do
   end
 
   @doc """
+  Delete a room
+  """
+  @spec clear_room(Ecto.UUID.t()) :: {:ok, Room.t()} | {:error, Ecto.Changeset.t()}
+  def clear_room(id) do
+    try do
+      Room
+      |> Repo.get!(id)
+      |> Repo.delete()
+    rescue
+      Ecto.NoResultsError -> {:error, %Ecto.Changeset{errors: [id: "invalid"]}}
+    end
+  end
+
+  @doc """
   Add to count
   """
   @spec increment_count(Ecto.UUID.t()) :: {:ok, integer()} | {:error, String.t()}
   def increment_count(id) do
-    with %Room{player_count: old_count} = room <- RoomQueries.get(id),
+    with %Room{player_count: old_count} = room <- RoomQueries.get_count(id),
          {:ok, %Room{player_count: new_count}} <- do_increment(room, old_count) do
       {:ok, new_count}
     else

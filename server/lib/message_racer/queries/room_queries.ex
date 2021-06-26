@@ -36,6 +36,19 @@ defmodule MessageRacer.RoomQueries do
   end
 
   @doc """
+  Get all available rooms
+  """
+  @spec get_count(Ecto.UUID.t()) :: %Room{} | nil
+  def get_count(id) do
+    from(
+      room in Room,
+      where: room.id == ^id,
+      select: struct(room, [:id, :player_count])
+    )
+    |> Repo.get(id)
+  end
+
+  @doc """
   All within the id eet
   """
   @spec all_within([Ecto.UUID.t()]) :: [%Room{}]

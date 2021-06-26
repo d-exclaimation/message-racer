@@ -7,7 +7,10 @@ defmodule MessageRacer.Application do
 
   def start(_type, _args) do
     children = [
+      # Timing function seperate thread task capabilities
       {Timing.Supervisor, name: Timing.Supervisor},
+      # Game InMemory
+      {MessageRacer.InMemory.Supervisor, name: MessageRacer.InMemory.Supervisor},
       # Start the Ecto repository
       MessageRacer.Repo,
       # Start the Telemetry supervisor

@@ -26,6 +26,7 @@ defmodule MessageRacerWeb.GameSchema do
   @desc "Event to stop force leave all users"
   object :end_event do
     field :type, non_null(:event_type)
+    field :winner, non_null(:string)
   end
 
   @desc "Event to send in valid changes"
@@ -39,8 +40,7 @@ defmodule MessageRacerWeb.GameSchema do
   @desc "Event to trigger start for each player"
   object :start_event do
     field :type, non_null(:event_type)
-
-    # TODO: Send in the paragraph
+    field :payload, non_null(list_of(non_null(:string)))
   end
 
   @desc "Event type"
