@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Main Tree Navigation Routes
 public enum MainRoute {
-    case room(id: UUID), main
+    case room(id: UUID), main, lobby
 }
 
 struct ContentView: View {
@@ -52,7 +52,7 @@ struct ContentView: View {
                 .environmentObject(user)
         }
         .onAppear {
-            route = user.isLoggedIn ? route : .main
+            route = user.isLoggedIn ? route : .lobby
         }
    }
     
@@ -67,11 +67,15 @@ struct ContentView: View {
         case .main:
             MainView(
                 color: .purple,
-                text: "Main Page"
-            ) {
-                navigate(to: .room(id: UUID()))
-            }
+                text: "Main Page",
+                navigate: navigate(to:)
+            )
             .transition(.slide)
+        case .lobby:
+            LobbyView(
+                color: .black,
+                navigate: navigate(to:)
+            )
         }
     }
 }

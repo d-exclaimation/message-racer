@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		537D2072268B11A70093D6D8 /* LobbyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537D2071268B11A70093D6D8 /* LobbyView.swift */; };
+		537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537D2073268B137C0093D6D8 /* RoomPreview.swift */; };
 		53AE31C2267E040F0025A4E9 /* RoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AE31C1267E040F0025A4E9 /* RoomView.swift */; };
 		53AE31C4267E0BB90025A4E9 /* Color+RGBA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AE31C3267E0BB90025A4E9 /* Color+RGBA.swift */; };
 		53AE31C6267E272E0025A4E9 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AE31C5267E272E0025A4E9 /* ChatMessage.swift */; };
@@ -22,6 +24,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		537D2071268B11A70093D6D8 /* LobbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyView.swift; sourceTree = "<group>"; };
+		537D2073268B137C0093D6D8 /* RoomPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomPreview.swift; sourceTree = "<group>"; };
 		53874CBD267F4C7500918C7D /* MessageRacer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MessageRacer.entitlements; sourceTree = "<group>"; };
 		53AE31C1267E040F0025A4E9 /* RoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomView.swift; sourceTree = "<group>"; };
 		53AE31C3267E0BB90025A4E9 /* Color+RGBA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Color+RGBA.swift"; sourceTree = "<group>"; };
@@ -49,6 +53,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		537D2070268B11900093D6D8 /* Lobby */ = {
+			isa = PBXGroup;
+			children = (
+				537D2071268B11A70093D6D8 /* LobbyView.swift */,
+				537D2073268B137C0093D6D8 /* RoomPreview.swift */,
+			);
+			path = Lobby;
+			sourceTree = "<group>";
+		};
 		53AE31C0267E03FC0025A4E9 /* Room */ = {
 			isa = PBXGroup;
 			children = (
@@ -133,6 +146,7 @@
 		53B45E22267C9BD6007BF7DE /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				537D2070268B11900093D6D8 /* Lobby */,
 				53AE31C0267E03FC0025A4E9 /* Room */,
 				53B45E28267CB9C5007BF7DE /* Shared */,
 				53B45E23267C9BF7007BF7DE /* Main */,
@@ -227,8 +241,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				537D2072268B11A70093D6D8 /* LobbyView.swift in Sources */,
 				53B45E2A267CB9D6007BF7DE /* NavView.swift in Sources */,
 				53AE31C6267E272E0025A4E9 /* ChatMessage.swift in Sources */,
+				537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */,
 				53B45E13267C84F5007BF7DE /* ContentView.swift in Sources */,
 				53AE31C2267E040F0025A4E9 /* RoomView.swift in Sources */,
 				53B45E25267C9C16007BF7DE /* Index.swift in Sources */,
