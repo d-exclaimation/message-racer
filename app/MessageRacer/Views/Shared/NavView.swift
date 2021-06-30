@@ -9,13 +9,18 @@ import SwiftUI
 
 public struct NavView: View {
     let roomID: UUID?
+    let navigate: (MainRoute) -> Void
     let leaveRoom: () -> Void
     
     public var body: some View {
         HStack(spacing: 10) {
-            Text("Message Racer")
-                .font(.headline)
-                .foregroundColor(.purple)
+            Button {
+                navigate(.main)
+            } label: {
+                Text("Message Racer")
+                    .font(.headline)
+                    .foregroundColor(.purple)
+            }
             if let roomID = roomID {
                 Text("\(roomID)")
                     .font(.system(size: 8, weight: .thin, design: .monospaced))
@@ -37,6 +42,6 @@ public struct NavView: View {
 
 struct NavView_Previews: PreviewProvider {
     static var previews: some View {
-        NavView(roomID: UUID()) {}
+        NavView(roomID: UUID(), navigate: {_ in }, leaveRoom: {})
     }
 }

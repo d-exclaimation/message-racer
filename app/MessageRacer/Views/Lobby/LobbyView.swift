@@ -8,13 +8,12 @@
 import SwiftUI
 
 public struct LobbyView: View {
-    @EnvironmentObject var user: User
-    
     let color: Color
     let navigate: (MainRoute) -> Void
     
+    // TODO: - Update to fetch from API
     private let mockRooms: [Room] = Array(0...100)
-        .map { Room(id: UUID(), playerCount: $0) }
+        .map { _ in Room(id: UUID(), playerCount: Int.random(in: 0...4)) }
     
     public var body: some View {
         ZStack {
@@ -22,6 +21,7 @@ public struct LobbyView: View {
                 .foregroundColor(color)
                 .ignoresSafeArea(.all)
             
+            // All the Rooms available
             ScrollView {
                 LazyVStack {
                     ForEach(mockRooms) { room in
@@ -31,29 +31,9 @@ public struct LobbyView: View {
                             RoomPreview(room: room)
                         }
                     }
-                    
                 }
             }
             .padding(.top, 15)
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    Button {
-                        navigate(.main)
-                    } label: {
-                        Image(systemName: "arrowshape.turn.up.backward.fill")
-                            .padding(15)
-                            .foregroundColor(foreground)
-                            .background(
-                                Circle()
-                                    .foregroundColor(.black)
-                            )
-                            .padding(5)
-                    }
-                }
-            }
-            .frame(maxHeight: .infinity)
         }
     }
     
@@ -62,6 +42,6 @@ public struct LobbyView: View {
 
 struct LobbyView_Previews: PreviewProvider {
     static var previews: some View {
-        LobbyView(color: .black, navigate: { _ in print("a") }).environmentObject(User())
+        LobbyView(color: .black, navigate: { _ in print("a") })
     }
 }

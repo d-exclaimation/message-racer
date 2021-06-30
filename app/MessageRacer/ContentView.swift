@@ -45,14 +45,14 @@ struct ContentView: View {
     var body: some View {
         VStack {
             // Navigation Bar
-            NavView(roomID: roomID, leaveRoom: leaveRoom)
+            NavView(roomID: roomID, navigate: navigate(to:), leaveRoom: leaveRoom)
             
             // Either room view or main view
             content()
                 .environmentObject(user)
         }
         .onAppear {
-            route = user.isLoggedIn ? route : .lobby
+            route = user.isLoggedIn ? route : .main
         }
    }
     
@@ -63,19 +63,20 @@ struct ContentView: View {
                 color: Color(UIColor.mediumPurple),
                 uuid: id
             )
-            .transition(.slide)
+                .transition(.offset(y: 1000))
         case .main:
             MainView(
-                color: .purple,
+                color: Color(UIColor.mediumPurple),
                 text: "Main Page",
                 navigate: navigate(to:)
             )
-            .transition(.slide)
+                .transition(.asymmetric(insertion: .slide, removal: .opacity))
         case .lobby:
             LobbyView(
-                color: .black,
+                color: Color(UIColor.mediumPurple),
                 navigate: navigate(to:)
             )
+                .transition(.offset(y: 1000))
         }
     }
 }

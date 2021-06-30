@@ -25,7 +25,7 @@ public struct MainView: View {
                 Button {
                     navigate(.room(id: UUID()))
                 } label: {
-                    buttonLabel(text: "Join a room")
+                    buttonLabel(text: "Join a room", iconName: "gamecontroller.fill")
                 }
                 Button {
                     navigate(.main)
@@ -35,27 +35,32 @@ public struct MainView: View {
                 Button {
                     navigate(.lobby)
                 } label: {
-                    buttonLabel(text: "Explore rooms")
+                    buttonLabel(text: "Explore rooms", iconName: "house.circle.fill")
                 }
             }
         }
     }
     
-    private let fontColor: Color = .purple
+    private let fontColor: Color = Color(UIColor.mediumPurple)
     
     
-    private func buttonLabel(text: String) -> some View {
-        Text(text)
-            .foregroundColor(fontColor)
-            .frame(width: 300)
-            .padding()
-            .background(Color.white)
-            .cornerRadius(5)
+    private func buttonLabel(text: String, iconName: String = "circle.grid.cross.fill") -> some View {
+        HStack {
+            Image(systemName: iconName)
+                .foregroundColor(fontColor)
+            Text(text)
+                .font(.headline)
+                .foregroundColor(fontColor)
+       }
+        .frame(width: 300)
+        .padding()
+        .background(Color.white)
+        .cornerRadius(8)
     }
 }
 
 struct MainView_Preview: PreviewProvider {
     static var previews: some View {
-        MainView(color: .red, text: "Hello World", navigate: { _ in print("a") }).environmentObject(User())
+        MainView(color: .purple, text: "Hello World", navigate: { _ in print("a") }).environmentObject(User())
     }
 }

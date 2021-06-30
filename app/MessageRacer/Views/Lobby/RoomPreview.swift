@@ -15,26 +15,48 @@ public struct Room: Codable, Identifiable {
 public struct RoomPreview: View {
     let room: Room
     
+    var availabilities: Color {
+        if room.playerCount <= 2 {
+            return .green
+        } else if room.playerCount <= 3 {
+            return .yellow
+        }
+        return .red
+    }
+    
     public var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: radius)
-                .foregroundColor(.purple)
+                .foregroundColor(availabilities)
             Rectangle()
                 .foregroundColor(.white)
                 .padding(.leading, 10)
             VStack {
-                Text(room.id.description)
+                Text(room.id.uuidString)
+                    .font(.caption)
+                    .fontWeight(.thin)
                     .foregroundColor(.black)
-                Text(room.playerCount.description)
-                    .foregroundColor(.black)
-            }
+                HStack {
+                    Text("Player count: ")
+                        .font(.caption)
+                        .foregroundColor(.black)
+                    Text(room.playerCount.description)
+                        .font(.caption)
+                        .foregroundColor(availabilities)
+                }
+                .padding(.top, 2)
+           }
+            .padding(.horizontal, 10)
         }
         .frame(maxWidth: .infinity, minHeight: height)
         .cornerRadius(radius)
+        .padding(.horizontal, 5)
    }
     
     private let radius: CGFloat = 5
     private let height: CGFloat = 75
+    
+    
 }
 
 struct RoomPreview_Previews: PreviewProvider {
