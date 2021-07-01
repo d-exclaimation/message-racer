@@ -7,18 +7,14 @@
 
 import SwiftUI
 
-public struct Room: Codable, Identifiable {
-    public let id: UUID
-    public let playerCount: Int
-}
 
 public struct RoomPreview: View {
-    let room: Room
+    let room: LobbyRoom
     
     var availabilities: Color {
-        if room.playerCount <= 2 {
+        if room.players.count <= 2 {
             return .green
-        } else if room.playerCount <= 3 {
+        } else if room.players.count <= 3 {
             return .yellow
         }
         return .red
@@ -32,7 +28,7 @@ public struct RoomPreview: View {
                 .foregroundColor(.white)
                 .padding(.leading, 10)
             VStack {
-                Text(room.id.uuidString)
+                Text(room.id)
                     .font(.caption)
                     .fontWeight(.thin)
                     .foregroundColor(.black)
@@ -40,7 +36,7 @@ public struct RoomPreview: View {
                     Text("Player count: ")
                         .font(.caption)
                         .foregroundColor(.black)
-                    Text(room.playerCount.description)
+                    Text(room.players.count.description)
                         .font(.caption)
                         .foregroundColor(availabilities)
                 }
@@ -61,6 +57,6 @@ public struct RoomPreview: View {
 
 struct RoomPreview_Previews: PreviewProvider {
     static var previews: some View {
-        RoomPreview(room: Room(id: UUID(), playerCount: 3))
+        RoomPreview(room: LobbyRoom(id: "", players: []))
     }
 }
