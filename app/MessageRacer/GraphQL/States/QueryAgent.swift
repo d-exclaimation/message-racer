@@ -63,7 +63,7 @@ public class QueryAgent<TQuery: GraphQLQuery>: ObservableObject {
     fileprivate func assignData(datum: TQuery.Data) {
         withAnimation {
             data = datum
-            isLoading.toggle()
+            isLoading = false
         }
     }
     
@@ -71,12 +71,12 @@ public class QueryAgent<TQuery: GraphQLQuery>: ObservableObject {
         print("Error: \(err)")
         withAnimation {
             error = err
-            isLoading.toggle()
+            isLoading = true
         }
     }
     
     fileprivate func request() -> Cancellable {
-        isLoading = false
+        isLoading = true
         return Graph.shared.fetch(
             query: query,
             onSuccess: assignData(datum:),
