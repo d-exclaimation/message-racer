@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		53135176268E02BE00D21A2E /* QueryAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53135175268E02BE00D21A2E /* QueryAgent.swift */; };
 		537D2072268B11A70093D6D8 /* LobbyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537D2071268B11A70093D6D8 /* LobbyView.swift */; };
 		537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537D2073268B137C0093D6D8 /* RoomPreview.swift */; };
 		53AE31C2267E040F0025A4E9 /* RoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AE31C1267E040F0025A4E9 /* RoomView.swift */; };
@@ -27,7 +28,7 @@
 		53DB3277268D9D67006CE332 /* ApolloUtils in Frameworks */ = {isa = PBXBuildFile; productRef = 53DB3276268D9D67006CE332 /* ApolloUtils */; };
 		53DB3279268D9D67006CE332 /* ApolloWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = 53DB3278268D9D67006CE332 /* ApolloWebSocket */; };
 		53DB327C268DA0B5006CE332 /* schema.json in Resources */ = {isa = PBXBuildFile; fileRef = 53DB327B268DA0B5006CE332 /* schema.json */; };
-		53DB327F268DA205006CE332 /* Apollo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DB327E268DA205006CE332 /* Apollo.swift */; };
+		53DB327F268DA205006CE332 /* Graph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DB327E268DA205006CE332 /* Graph.swift */; };
 		53DB3281268DA22B006CE332 /* AvailableRooms.graphql in Resources */ = {isa = PBXBuildFile; fileRef = 53DB3280268DA22B006CE332 /* AvailableRooms.graphql */; };
 		53DB3284268DA392006CE332 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DB3283268DA392006CE332 /* API.swift */; };
 		53DB3286268DBEFF006CE332 /* LobbyRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DB3285268DBEFF006CE332 /* LobbyRoom.swift */; };
@@ -36,6 +37,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		53135175268E02BE00D21A2E /* QueryAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryAgent.swift; sourceTree = "<group>"; };
 		537D2071268B11A70093D6D8 /* LobbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyView.swift; sourceTree = "<group>"; };
 		537D2073268B137C0093D6D8 /* RoomPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomPreview.swift; sourceTree = "<group>"; };
 		53874CBD267F4C7500918C7D /* MessageRacer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MessageRacer.entitlements; sourceTree = "<group>"; };
@@ -53,7 +55,7 @@
 		53B45E26267CB5C1007BF7DE /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		53B45E29267CB9D6007BF7DE /* NavView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavView.swift; sourceTree = "<group>"; };
 		53DB327B268DA0B5006CE332 /* schema.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = schema.json; sourceTree = "<group>"; };
-		53DB327E268DA205006CE332 /* Apollo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Apollo.swift; sourceTree = "<group>"; };
+		53DB327E268DA205006CE332 /* Graph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Graph.swift; sourceTree = "<group>"; };
 		53DB3280268DA22B006CE332 /* AvailableRooms.graphql */ = {isa = PBXFileReference; lastKnownFileType = text; path = AvailableRooms.graphql; sourceTree = "<group>"; };
 		53DB3283268DA392006CE332 /* API.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = API.swift; path = MessageRacer/API.swift; sourceTree = SOURCE_ROOT; };
 		53DB3285268DBEFF006CE332 /* LobbyRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyRoom.swift; sourceTree = "<group>"; };
@@ -78,6 +80,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		53135172268DFE1900D21A2E /* States */ = {
+			isa = PBXGroup;
+			children = (
+				53135175268E02BE00D21A2E /* QueryAgent.swift */,
+			);
+			path = States;
+			sourceTree = "<group>";
+		};
 		537D2070268B11900093D6D8 /* Lobby */ = {
 			isa = PBXGroup;
 			children = (
@@ -205,7 +215,8 @@
 		53DB327D268DA1ED006CE332 /* GraphQL */ = {
 			isa = PBXGroup;
 			children = (
-				53DB327E268DA205006CE332 /* Apollo.swift */,
+				53135172268DFE1900D21A2E /* States */,
+				53DB327E268DA205006CE332 /* Graph.swift */,
 				53DB3283268DA392006CE332 /* API.swift */,
 				53DB3280268DA22B006CE332 /* AvailableRooms.graphql */,
 			);
@@ -340,10 +351,11 @@
 				53AE31C6267E272E0025A4E9 /* ChatMessage.swift in Sources */,
 				537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */,
 				53B45E13267C84F5007BF7DE /* ContentView.swift in Sources */,
-				53DB327F268DA205006CE332 /* Apollo.swift in Sources */,
+				53DB327F268DA205006CE332 /* Graph.swift in Sources */,
 				53DB3284268DA392006CE332 /* API.swift in Sources */,
 				53AE31C2267E040F0025A4E9 /* RoomView.swift in Sources */,
 				53B45E25267C9C16007BF7DE /* Index.swift in Sources */,
+				53135176268E02BE00D21A2E /* QueryAgent.swift in Sources */,
 				53AE31C4267E0BB90025A4E9 /* Color+RGBA.swift in Sources */,
 				53AE31CA267E27770025A4E9 /* FlippedUpsideDown.swift in Sources */,
 				53B45E27267CB5C1007BF7DE /* User.swift in Sources */,

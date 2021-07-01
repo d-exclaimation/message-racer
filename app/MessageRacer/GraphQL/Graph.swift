@@ -1,5 +1,5 @@
 //
-//  Apollo.swift
+//  Graph.swift
 //  MessageRacer
 //
 //  Created by Vincent on 7/1/21.
@@ -8,8 +8,8 @@
 import Foundation
 import Apollo
 
-public class Network {
-    public static let shared = Network()
+public class Graph {
+    public static let shared = Graph()
     public lazy var apollo = ApolloClient(url: URL(string: Preferences.shared.api)!)
     
     /// Fecth request and perform action according

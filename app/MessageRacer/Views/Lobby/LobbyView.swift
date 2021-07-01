@@ -13,15 +13,11 @@ public struct LobbyView: View {
     let color: Color
     let navigate: (MainRoute) -> Void
     
-    @State
-    var rooms = [LobbyRoom]()
-    
-    func setRooms(data: AvailableRoomsQuery.Data) -> Void {
-        print("API Success")
-        withAnimation {
-            rooms = data.availableRooms
-        }
-    }
+    @StateObject
+    var roomAgent = Graph.useQuery(
+        query: AvailableRoomsQuery(),
+        fallback: {AvailableRoomsQuery.Data(availableRooms: [])}
+    )
     
     public var body: some View {
         ZStack {
@@ -32,7 +28,7 @@ public struct LobbyView: View {
             // All the Rooms available
             ScrollView {
                 LazyVStack {
-                    ForEach(rooms) { room in
+                    ForEach(roomAgent.data?.availableRooms ?? []) { room in
                         Button {
                             navigate(
                                 .room(id: room.uuid)
@@ -45,18 +41,9 @@ public struct LobbyView: View {
             }
             .padding(.top, 15)
         }
-        .onAppear(perform: onMount)
     }
     
     private let foreground: Color = .white
-    
-    private func onMount() -> Void {
-        _ = Network.shared.fetch(
-            query: AvailableRoomsQuery(),
-            onSuccess: setRooms(data:),
-            onError: { print("\($0)") }
-        )
-    }
 }
 
 struct LobbyView_Previews: PreviewProvider {
