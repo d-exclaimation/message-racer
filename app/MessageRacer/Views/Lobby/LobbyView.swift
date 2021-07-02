@@ -14,9 +14,9 @@ public struct LobbyView: View {
     let navigate: (MainRoute) -> Void
     
     @StateObject
-    var roomAgent = Graph.useQuery(
-        query: AvailableRoomsQuery(),
-        fallback: {AvailableRoomsQuery.Data(availableRooms: [])}
+    var roomAgent = Orfeus.use(
+        awaiting: AvailableRoomsQuery(),
+        fallback: AvailableRoomsQuery.Data(availableRooms: [])
     )
     
     public var body: some View {
@@ -30,9 +30,7 @@ public struct LobbyView: View {
                 LazyVStack {
                     ForEach(roomAgent.data?.availableRooms ?? []) { room in
                         Button {
-                            navigate(
-                                .room(id: room.uuid)
-                            )
+                            navigate(.room(id: room.uuid))
                         } label: {
                             RoomPreview(room: room)
                         }

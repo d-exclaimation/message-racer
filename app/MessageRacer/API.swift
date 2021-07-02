@@ -146,3 +146,98 @@ public final class AvailableRoomsQuery: GraphQLQuery {
     }
   }
 }
+
+public final class CreateRoomMutation: GraphQLMutation {
+  /// The raw GraphQL definition of this operation.
+  public let operationDefinition: String =
+    """
+    mutation CreateRoom($username: String!) {
+      createRoom(userInfo: {username: $username}) {
+        __typename
+        id
+      }
+    }
+    """
+
+  public let operationName: String = "CreateRoom"
+
+  public var username: String
+
+  public init(username: String) {
+    self.username = username
+  }
+
+  public var variables: GraphQLMap? {
+    return ["username": username]
+  }
+
+  public struct Data: GraphQLSelectionSet {
+    public static let possibleTypes: [String] = ["RootMutationType"]
+
+    public static var selections: [GraphQLSelection] {
+      return [
+        GraphQLField("createRoom", arguments: ["userInfo": ["username": GraphQLVariable("username")]], type: .object(CreateRoom.selections)),
+      ]
+    }
+
+    public private(set) var resultMap: ResultMap
+
+    public init(unsafeResultMap: ResultMap) {
+      self.resultMap = unsafeResultMap
+    }
+
+    public init(createRoom: CreateRoom? = nil) {
+      self.init(unsafeResultMap: ["__typename": "RootMutationType", "createRoom": createRoom.flatMap { (value: CreateRoom) -> ResultMap in value.resultMap }])
+    }
+
+    /// Create a new room
+    public var createRoom: CreateRoom? {
+      get {
+        return (resultMap["createRoom"] as? ResultMap).flatMap { CreateRoom(unsafeResultMap: $0) }
+      }
+      set {
+        resultMap.updateValue(newValue?.resultMap, forKey: "createRoom")
+      }
+    }
+
+    public struct CreateRoom: GraphQLSelectionSet {
+      public static let possibleTypes: [String] = ["Room"]
+
+      public static var selections: [GraphQLSelection] {
+        return [
+          GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
+          GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
+        ]
+      }
+
+      public private(set) var resultMap: ResultMap
+
+      public init(unsafeResultMap: ResultMap) {
+        self.resultMap = unsafeResultMap
+      }
+
+      public init(id: GraphQLID) {
+        self.init(unsafeResultMap: ["__typename": "Room", "id": id])
+      }
+
+      public var __typename: String {
+        get {
+          return resultMap["__typename"]! as! String
+        }
+        set {
+          resultMap.updateValue(newValue, forKey: "__typename")
+        }
+      }
+
+      /// Identifier
+      public var id: GraphQLID {
+        get {
+          return resultMap["id"]! as! GraphQLID
+        }
+        set {
+          resultMap.updateValue(newValue, forKey: "id")
+        }
+      }
+    }
+  }
+}
