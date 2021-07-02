@@ -15,6 +15,9 @@ public struct MainView: View {
     let text: String
     let navigate: (MainRoute) -> Void
     
+    @State
+    var showCreateMenuForm = false
+    
     public var body: some View {
         ZStack {
             Rectangle()
@@ -28,6 +31,7 @@ public struct MainView: View {
                     buttonLabel(text: "Join a room", iconName: "gamecontroller.fill")
                 }
                 Button {
+                    showCreateMenuForm.toggle()
                     navigate(.main)
                 } label: {
                     buttonLabel(text: "Create a room")
@@ -37,6 +41,12 @@ public struct MainView: View {
                 } label: {
                     buttonLabel(text: "Explore rooms", iconName: "house.circle.fill")
                 }
+            }
+            .sheet(
+                isPresented: $showCreateMenuForm,
+                onDismiss: { showCreateMenuForm = false }
+            ) {
+                CreateRoomFormView(isShowing: $showCreateMenuForm)
             }
         }
     }

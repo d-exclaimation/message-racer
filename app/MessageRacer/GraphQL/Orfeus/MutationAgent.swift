@@ -50,7 +50,7 @@ extension Orfeus {
         
         /// isLoading state to notify where the operation has been resolved
         @Published
-        public var isLoading: Bool = true
+        public var isLoading: Bool = false
         
         /// Network request cancellable request
         ///

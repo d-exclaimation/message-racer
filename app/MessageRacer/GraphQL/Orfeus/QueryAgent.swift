@@ -37,7 +37,7 @@ extension Orfeus {
         
         /// isLoading state to notify where the operation has been resolved
         @Published
-        public var isLoading: Bool = true
+        public var isLoading: Bool = false
         
         /// Returned error when network fails
         @Published
@@ -69,6 +69,7 @@ extension Orfeus {
         
         /// Invalidate query agent state, refetch data, and managed new states
         public func invalidate() -> Void {
+            cancellable?.cancel()
             cancellable = request()
         }
         
