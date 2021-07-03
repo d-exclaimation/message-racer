@@ -1,2 +1,2 @@
 app/MessageRacer/Models/ -linguist-detectable
-app/MessageRacer/GraphQL/API.swift linguist-language=Elixir
+app/MessageRacer/API.swift linguist-language=Elixir
