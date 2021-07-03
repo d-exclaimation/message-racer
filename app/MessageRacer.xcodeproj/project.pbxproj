@@ -21,7 +21,7 @@
 		53AFC084268ED5A900C60467 /* Agent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AFC083268ED5A900C60467 /* Agent.swift */; };
 		53AFC086268EDF8300C60467 /* AwaitingAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AFC085268EDF8300C60467 /* AwaitingAgent.swift */; };
 		53AFC088268F144500C60467 /* JoinRoom.graphql in Resources */ = {isa = PBXBuildFile; fileRef = 53AFC087268F144500C60467 /* JoinRoom.graphql */; };
-		53AFC08B268F1B0700C60467 /* CreateRoomFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AFC08A268F1B0700C60467 /* CreateRoomFormView.swift */; };
+		53AFC08B268F1B0700C60467 /* UserInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AFC08A268F1B0700C60467 /* UserInfoView.swift */; };
 		53B45E11267C84F5007BF7DE /* MessageRacerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B45E10267C84F5007BF7DE /* MessageRacerApp.swift */; };
 		53B45E13267C84F5007BF7DE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B45E12267C84F5007BF7DE /* ContentView.swift */; };
 		53B45E15267C84F7007BF7DE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 53B45E14267C84F7007BF7DE /* Assets.xcassets */; };
@@ -58,7 +58,7 @@
 		53AFC083268ED5A900C60467 /* Agent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agent.swift; sourceTree = "<group>"; };
 		53AFC085268EDF8300C60467 /* AwaitingAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AwaitingAgent.swift; sourceTree = "<group>"; };
 		53AFC087268F144500C60467 /* JoinRoom.graphql */ = {isa = PBXFileReference; lastKnownFileType = text; path = JoinRoom.graphql; sourceTree = "<group>"; };
-		53AFC08A268F1B0700C60467 /* CreateRoomFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateRoomFormView.swift; sourceTree = "<group>"; };
+		53AFC08A268F1B0700C60467 /* UserInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoView.swift; sourceTree = "<group>"; };
 		53B45E0D267C84F5007BF7DE /* MessageRacer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MessageRacer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		53B45E10267C84F5007BF7DE /* MessageRacerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageRacerApp.swift; sourceTree = "<group>"; };
 		53B45E12267C84F5007BF7DE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -151,7 +151,7 @@
 		53AFC089268F1AEF00C60467 /* Form */ = {
 			isa = PBXGroup;
 			children = (
-				53AFC08A268F1B0700C60467 /* CreateRoomFormView.swift */,
+				53AFC08A268F1B0700C60467 /* UserInfoView.swift */,
 			);
 			path = Form;
 			sourceTree = "<group>";
@@ -382,7 +382,7 @@
 				53DB328D268DC4EF006CE332 /* Plist.swift in Sources */,
 				53DB3286268DBEFF006CE332 /* LobbyRoom.swift in Sources */,
 				53AE31C6267E272E0025A4E9 /* ChatMessage.swift in Sources */,
-				53AFC08B268F1B0700C60467 /* CreateRoomFormView.swift in Sources */,
+				53AFC08B268F1B0700C60467 /* UserInfoView.swift in Sources */,
 				537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */,
 				53B45E13267C84F5007BF7DE /* ContentView.swift in Sources */,
 				53DB327F268DA205006CE332 /* Orfeus.swift in Sources */,

@@ -17,6 +17,15 @@ public struct MainView: View {
     let navigate: (MainRoute) -> Void
     
     @State
+    var errorMessage: String? = nil
+    
+    /// Create Agent Mutation
+    @StateObject
+    var createAgent = Orfeus.use(
+        mutation: CreateRoomMutation.self
+    )
+    
+    @State
     var showCreateMenuForm = false
     
     public var body: some View {
@@ -47,9 +56,21 @@ public struct MainView: View {
                 isPresented: $showCreateMenuForm,
                 onDismiss: { showCreateMenuForm = false }
             ) {
-                CreateRoomFormView(isShowing: $showCreateMenuForm, createRoom: createNewRoom(roomID:username:))
+                UserInfoView(isShowing: $showCreateMenuForm, errorMessage: $errorMessage, isLoading: createAgent.isLoading) { username in
+                    createAgent.mutate(
+                        variables: CreateRoomMutation(username: username),
+                        onCompleted: handleSuccess(data:),
+                        onFailure: { errorMessage = $0.message }
+                    )
+                }
             }
         }
+    }
+    /// Handle creation success with joining room
+    private func handleSuccess(data: CreateRoomMutation.Data) -> Void {
+        let roomId = data.createRoom.room.id
+        let username = data.createRoom.host.username
+        createNewRoom(roomID: roomId, username: username)
     }
     
     private let fontColor: Color = Color(UIColor.mediumPurple)

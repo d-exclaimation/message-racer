@@ -11,8 +11,16 @@ import ActivityIndicatorView
 
 
 public struct LobbyView: View {
+    @EnvironmentObject var user: User
     let color: Color
     let navigate: (MainRoute) -> Void
+    
+    @State
+    var showForm: Bool = false
+    @State
+    var errorMessage: String? = nil
+    @State
+    var roomID: GraphQLID? = nil
     
     /// Room Feed  Agent
     @StateObject
@@ -47,7 +55,7 @@ public struct LobbyView: View {
                     LazyVStack {
                         ForEach(data.availableRooms) { room in
                             Button {
-                                navigate(.room(id: room.uuid))
+                                roomID = room.id
                             } label: {
                                 RoomPreview(room: room)
                             }
@@ -56,12 +64,30 @@ public struct LobbyView: View {
                 }
                 .padding(.top, 15)
                 .transition(.scale(scale: 0.3).combined(with: .opacity))
+                .sheet(
+                    isPresented: $showForm,
+                    onDismiss: { showForm = false }
+                ) {
+                    UserInfoView(isShowing: $showForm, errorMessage: $errorMessage, isLoading: joinAgent.isLoading) { username in
+                        guard let roomID = roomID else { return }
+                        joinAgent.mutate(
+                            variables: JoinRoomMutation(id: roomID, username: username),
+                            onCompleted: handleSuccess(data:),
+                            onFailure: { errorMessage = $0.message }
+                        )
+                        user.login(username: username)
+                    }
+                }
             case .failed(let err):
                 Text(err.message)
                     .transition(.scale(scale: 0.3).combined(with: .opacity))
             }
             
         }
+    }
+    private func handleSuccess(data: JoinRoomMutation.Data) -> Void {
+        guard let roomID = UUID(uuidString: data.joinRoom.id) else { return }
+        navigate(.room(id: roomID))
     }
     
     private let foreground: Color = .white
