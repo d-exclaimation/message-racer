@@ -1,2 +1,2 @@
-message-racer/app/MessageRacer/Models/ -linguist-detectable
-message-racer/app/MessageRacer/GraphQL/Orfeus/ -linguist-detectable
+app/MessageRacer/Models/ -linguist-detectable
+app/MessageRacer/GraphQL/API.swift linguist-language=Elixir
