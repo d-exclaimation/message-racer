@@ -28,20 +28,30 @@ extension Orfeus {
     /// // Data is not loaded
     /// ```
     ///
+    /// Highly recommend taking advatage of `state` property as it allow for type safe, clear declarative workflow
+    ///
     public class QueryAgent<TQuery: GraphQLQuery>: ObservableObject, OrfeusInvalidatableAgent, OrfeusAgent {
         // MARK: - States
         
-        /// Data from the Query managed by the Agent
+        /// State of the Query for better clarify over current situtation of data
+        ///
+        /// ```swift
+        /// switch roomAgent.state {
+        /// case .idle:
+        ///     EmptyView("Not loaded")
+        /// case .loading:
+        ///     Text("Loading...")
+        /// case .succeed(let data):
+        ///     LazyVStack {
+        ///         ForEach(data.posts, content: Post.init(post:))
+        ///     }
+        /// }
+        /// case .failed(_):
+        ///     Text("No data")
+        /// }
+        /// ```
         @Published
-        public var data: TQuery.Data? = nil
-        
-        /// isLoading state to notify where the operation has been resolved
-        @Published
-        public var isLoading: Bool = false
-        
-        /// Returned error when network fails
-        @Published
-        public var error: Error? = nil
+        public var state: AgentState<TQuery.Data> = .idle
         
         /// Network request cancellable request
         ///
@@ -49,14 +59,29 @@ extension Orfeus {
         @Published
         public var cancellable: Cancellable? = nil
         
+        /// Data from the Query managed by the Agent
+        public var data: TQuery.Data? {
+            state.value
+        }
+        
+        /// isLoading state to notify where the operation has been resolved
+        public var isLoading: Bool {
+            state.isLoading
+        }
+        
+        /// Returned error when network fails
+        public var error: Fault? {
+            state.error
+        }
+        
         /// Vaulted data are data with the fallback mechanism
         ///
         /// Note: *Avoid using this when fallback is not given / nil*
         public var vault: TQuery.Data {
             guard let fallback = fallback else {
-                return data!
+                return state.value!
             }
-            return data ?? fallback
+            return state.value ?? fallback
         }
         
         // MARK: - Public methods / actions
@@ -95,23 +120,21 @@ extension Orfeus {
         /// Manage data callback
         fileprivate func assignData(datum: TQuery.Data) {
             withAnimation {
-                data = datum
-                isLoading = false
+                state = .succeed(datum)
             }
         }
         
         /// Handling error callback
-        fileprivate func handleError(err: Error) {
+        fileprivate func handleError(err: Fault) {
             print("Error: \(err)")
             withAnimation {
-                error = err
-                isLoading = true
+                state = .failed(err)
             }
         }
         
         /// GraphQL Network Request
         fileprivate func request() -> Cancellable {
-            isLoading = true
+            state = .loading
             return Orfeus.shared.fetch(
                 query: query,
                 onSuccess: assignData(datum:),

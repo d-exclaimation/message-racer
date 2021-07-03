@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		53135176268E02BE00D21A2E /* QueryAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53135175268E02BE00D21A2E /* QueryAgent.swift */; };
+		5339DC632690B53300856830 /* ActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 5339DC622690B53300856830 /* ActivityIndicatorView */; };
 		537D2072268B11A70093D6D8 /* LobbyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537D2071268B11A70093D6D8 /* LobbyView.swift */; };
 		537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537D2073268B137C0093D6D8 /* RoomPreview.swift */; };
 		53AE31C2267E040F0025A4E9 /* RoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AE31C1267E040F0025A4E9 /* RoomView.swift */; };
@@ -85,6 +86,7 @@
 				53DB3275268D9D67006CE332 /* ApolloCodegenLib in Frameworks */,
 				53DB3279268D9D67006CE332 /* ApolloWebSocket in Frameworks */,
 				53DB3271268D9D67006CE332 /* Apollo in Frameworks */,
+				5339DC632690B53300856830 /* ActivityIndicatorView in Frameworks */,
 				53DB3277268D9D67006CE332 /* ApolloUtils in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,6 +290,7 @@
 				53DB3274268D9D67006CE332 /* ApolloCodegenLib */,
 				53DB3276268D9D67006CE332 /* ApolloUtils */,
 				53DB3278268D9D67006CE332 /* ApolloWebSocket */,
+				5339DC622690B53300856830 /* ActivityIndicatorView */,
 			);
 			productName = MessageRacer;
 			productReference = 53B45E0D267C84F5007BF7DE /* MessageRacer.app */;
@@ -319,6 +322,7 @@
 			mainGroup = 53B45E04267C84F5007BF7DE;
 			packageReferences = (
 				53DB326F268D9D67006CE332 /* XCRemoteSwiftPackageReference "apollo-ios" */,
+				5339DC612690B53200856830 /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */,
 			);
 			productRefGroup = 53B45E0E267C84F5007BF7DE /* Products */;
 			projectDirPath = "";
@@ -612,6 +616,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		5339DC612690B53200856830 /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/ActivityIndicatorView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.7;
+			};
+		};
 		53DB326F268D9D67006CE332 /* XCRemoteSwiftPackageReference "apollo-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apollographql/apollo-ios.git";
@@ -623,6 +635,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5339DC622690B53300856830 /* ActivityIndicatorView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5339DC612690B53200856830 /* XCRemoteSwiftPackageReference "ActivityIndicatorView" */;
+			productName = ActivityIndicatorView;
+		};
 		53DB3270268D9D67006CE332 /* Apollo */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 53DB326F268D9D67006CE332 /* XCRemoteSwiftPackageReference "apollo-ios" */;

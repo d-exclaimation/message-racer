@@ -6,16 +6,23 @@
 //
 
 import SwiftUI
+import Apollo
 
 struct CreateRoomFormView: View {
     @Binding
     var isShowing: Bool
+    let createRoom: (GraphQLID, String) -> Void
     
     @State
     var username: String = ""
+    @State
+    var failed: Bool = false
+    @State
+    var reason: String = ""
     
+    /// Create Agent Mutation
     @StateObject
-    var createRoom = Orfeus.use(
+    var createAgent = Orfeus.use(
         mutation: CreateRoomMutation.self
     )
     
@@ -38,30 +45,52 @@ struct CreateRoomFormView: View {
                 Section(header: Text("User Info"), footer: submitButton) {
                     TextField("Username", text: $username)
                 }
+                
+                if failed {
+                    Text("\(reason)")
+                        .font(.system(size: 12, weight: .thin, design: .monospaced))
+                        .foregroundColor(.red)
+                }
             }
         }
     }
     
     var submitButton: some View {
         Button {
-            createRoom.mutate(
+            createAgent.mutate(
                 variables: CreateRoomMutation(username: username),
-                onCompleted: handleSuccess(data:)
+                onCompleted: handleSuccess(data:),
+                onFailure: handleFailure(_:)
             )
         } label: {
             Text("Submit")
         }
-        .disabled(createRoom.isLoading)
+        .disabled(createAgent.isLoading)
     }
     
     
+    private func handleFailure(_ err: Orfeus.Fault) -> Void {
+        switch err {
+        case .requestFailed(reason: let res):
+            reason = res
+        case .graphqlErrors(errors: let errors):
+            reason = errors.map { $0.message }.compactMap { $0 }.joined(separator: ", ")
+        case .nothingHappened:
+            reason = "nothing happened"
+        }
+        failed = true
+    }
+    
+    /// Handle creation success with joining room
     private func handleSuccess(data: CreateRoomMutation.Data) -> Void {
-        print(data.createRoom?.id ?? "no id")
+        let roomId = data.createRoom.room.id
+        let username = data.createRoom.host.username
+        createRoom(roomId, username)
     }
 }
 
 struct CreateRoomFormView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateRoomFormView(isShowing: Binding.constant(false))
+        CreateRoomFormView(isShowing: Binding.constant(false)) { _, _ in }
     }
 }

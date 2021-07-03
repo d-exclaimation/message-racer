@@ -154,7 +154,15 @@ public final class CreateRoomMutation: GraphQLMutation {
     mutation CreateRoom($username: String!) {
       createRoom(userInfo: {username: $username}) {
         __typename
-        id
+        host {
+          __typename
+          id
+          username
+        }
+        room {
+          __typename
+          id
+        }
       }
     }
     """
@@ -176,7 +184,7 @@ public final class CreateRoomMutation: GraphQLMutation {
 
     public static var selections: [GraphQLSelection] {
       return [
-        GraphQLField("createRoom", arguments: ["userInfo": ["username": GraphQLVariable("username")]], type: .object(CreateRoom.selections)),
+        GraphQLField("createRoom", arguments: ["userInfo": ["username": GraphQLVariable("username")]], type: .nonNull(.object(CreateRoom.selections))),
       ]
     }
 
@@ -186,27 +194,28 @@ public final class CreateRoomMutation: GraphQLMutation {
       self.resultMap = unsafeResultMap
     }
 
-    public init(createRoom: CreateRoom? = nil) {
-      self.init(unsafeResultMap: ["__typename": "RootMutationType", "createRoom": createRoom.flatMap { (value: CreateRoom) -> ResultMap in value.resultMap }])
+    public init(createRoom: CreateRoom) {
+      self.init(unsafeResultMap: ["__typename": "RootMutationType", "createRoom": createRoom.resultMap])
     }
 
     /// Create a new room
-    public var createRoom: CreateRoom? {
+    public var createRoom: CreateRoom {
       get {
-        return (resultMap["createRoom"] as? ResultMap).flatMap { CreateRoom(unsafeResultMap: $0) }
+        return CreateRoom(unsafeResultMap: resultMap["createRoom"]! as! ResultMap)
       }
       set {
-        resultMap.updateValue(newValue?.resultMap, forKey: "createRoom")
+        resultMap.updateValue(newValue.resultMap, forKey: "createRoom")
       }
     }
 
     public struct CreateRoom: GraphQLSelectionSet {
-      public static let possibleTypes: [String] = ["Room"]
+      public static let possibleTypes: [String] = ["HostInfo"]
 
       public static var selections: [GraphQLSelection] {
         return [
           GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
-          GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
+          GraphQLField("host", type: .nonNull(.object(Host.selections))),
+          GraphQLField("room", type: .nonNull(.object(Room.selections))),
         ]
       }
 
@@ -216,8 +225,8 @@ public final class CreateRoomMutation: GraphQLMutation {
         self.resultMap = unsafeResultMap
       }
 
-      public init(id: GraphQLID) {
-        self.init(unsafeResultMap: ["__typename": "Room", "id": id])
+      public init(host: Host, room: Room) {
+        self.init(unsafeResultMap: ["__typename": "HostInfo", "host": host.resultMap, "room": room.resultMap])
       }
 
       public var __typename: String {
@@ -229,13 +238,114 @@ public final class CreateRoomMutation: GraphQLMutation {
         }
       }
 
-      /// Identifier
-      public var id: GraphQLID {
+      /// Host player who created the room
+      public var host: Host {
         get {
-          return resultMap["id"]! as! GraphQLID
+          return Host(unsafeResultMap: resultMap["host"]! as! ResultMap)
         }
         set {
-          resultMap.updateValue(newValue, forKey: "id")
+          resultMap.updateValue(newValue.resultMap, forKey: "host")
+        }
+      }
+
+      /// Room created
+      public var room: Room {
+        get {
+          return Room(unsafeResultMap: resultMap["room"]! as! ResultMap)
+        }
+        set {
+          resultMap.updateValue(newValue.resultMap, forKey: "room")
+        }
+      }
+
+      public struct Host: GraphQLSelectionSet {
+        public static let possibleTypes: [String] = ["Player"]
+
+        public static var selections: [GraphQLSelection] {
+          return [
+            GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
+            GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
+            GraphQLField("username", type: .nonNull(.scalar(String.self))),
+          ]
+        }
+
+        public private(set) var resultMap: ResultMap
+
+        public init(unsafeResultMap: ResultMap) {
+          self.resultMap = unsafeResultMap
+        }
+
+        public init(id: GraphQLID, username: String) {
+          self.init(unsafeResultMap: ["__typename": "Player", "id": id, "username": username])
+        }
+
+        public var __typename: String {
+          get {
+            return resultMap["__typename"]! as! String
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "__typename")
+          }
+        }
+
+        /// The id, duh
+        public var id: GraphQLID {
+          get {
+            return resultMap["id"]! as! GraphQLID
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "id")
+          }
+        }
+
+        /// Unique username
+        public var username: String {
+          get {
+            return resultMap["username"]! as! String
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "username")
+          }
+        }
+      }
+
+      public struct Room: GraphQLSelectionSet {
+        public static let possibleTypes: [String] = ["Room"]
+
+        public static var selections: [GraphQLSelection] {
+          return [
+            GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
+            GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
+          ]
+        }
+
+        public private(set) var resultMap: ResultMap
+
+        public init(unsafeResultMap: ResultMap) {
+          self.resultMap = unsafeResultMap
+        }
+
+        public init(id: GraphQLID) {
+          self.init(unsafeResultMap: ["__typename": "Room", "id": id])
+        }
+
+        public var __typename: String {
+          get {
+            return resultMap["__typename"]! as! String
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "__typename")
+          }
+        }
+
+        /// Identifier
+        public var id: GraphQLID {
+          get {
+            return resultMap["id"]! as! GraphQLID
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "id")
+          }
         }
       }
     }

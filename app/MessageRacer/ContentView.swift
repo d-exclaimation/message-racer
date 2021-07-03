@@ -38,6 +38,7 @@ struct ContentView: View {
     /// Just a wrapper to move back to main used for Navigation Bar
     func leaveRoom() -> Void {
         withAnimation {
+            user.logout()
             route = .main
         }
     }
@@ -61,7 +62,8 @@ struct ContentView: View {
         case .room(let id):
             RoomView(
                 color: Color(UIColor.mediumPurple),
-                uuid: id
+                uuid: id,
+                navigate: navigate(to:)
             )
                 .transition(.offset(y: 1000))
         case .main:

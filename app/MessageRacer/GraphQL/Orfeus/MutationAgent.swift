@@ -40,17 +40,59 @@ extension Orfeus {
     /// )
     /// ```
     ///
+    /// Orfeus have a wrapping enum for Error instead of raw Error or GraphQL. This is for being able to respond to any type failure
+    /// Handling errors
+    /// ```swift
+    /// // Orfeus.Fault can network be failure, graphql errors from the server, or nothing happened (no data yet no errors)
+    /// someMutation.mutate(
+    ///     variables: SomeGraphQLMutation,
+    ///     onCompleted: { data in ... },
+    ///     onError: { err in
+    ///         switch err {
+    ///         case .requestFailed(let reason):
+    ///             show(reason)
+    ///         case .graphqlErrors(errors: let errors):
+    ///             errors.map { $0.message }.forEach { show($0) }
+    ///         case .nothingHappened:
+    ///             show("Please wait while issues are being resolve!")
+    ///     }
+    /// )
+    /// ```
+    /// Highly recommend taking advatage of `state` property as it allow for type safe, clear declarative workflo
+    ///
     public class MutationAgent<TMutation: GraphQLMutation>: ObservableObject, OrfeusAgent {
         
         // MARK: - States
         
-        /// Data from the Mutation managed by the Agent
+        /// State of the Mutations for better clarify over current situtation of data
+        ///
+        /// ```swift
+        /// switch roomAgent.state {
+        /// case .idle:
+        ///     EmptyView("Not loaded")
+        /// case .loading:
+        ///     Text("Loading...")
+        /// case .succeed(let data):
+        ///     LazyVStack {
+        ///         ForEach(data.posts, content: Post.init(post:))
+        ///     }
+        /// }
+        /// case .failed(_):
+        ///     Text("No data")
+        /// }
+        /// ```
         @Published
-        public var data: TMutation.Data? = nil
+        public var state: AgentState<TMutation.Data> = .idle
+        
+        /// Data from the Mutation managed by the Agent
+        public var data: TMutation.Data? {
+            state.value
+        }
         
         /// isLoading state to notify where the operation has been resolved
-        @Published
-        public var isLoading: Bool = false
+        public var isLoading: Bool {
+            state.isLoading
+        }
         
         /// Network request cancellable request
         ///
@@ -83,10 +125,28 @@ extension Orfeus {
         ///     }
         /// )
         /// ```
+        /// Orfeus have a wrapping enum for Error instead of raw Error or GraphQL. This is for being able to respond to any type failure
+        /// Handling errors
+        /// ```swift
+        /// // Orfeus.Fault can be network failure, graphql errors from the server, or nothing happened (no data yet no errors)
+        /// someMutation.mutate(
+        ///     variables: SomeGraphQLMutation,
+        ///     onCompleted: { data in ... },
+        ///     onError: { err in
+        ///         switch err {
+        ///         case .requestFailed(let reason):
+        ///             show(reason)
+        ///         case .graphqlErrors(errors: let errors):
+        ///             errors.map { $0.message }.forEach { show($0) }
+        ///         case .nothingHappened:
+        ///             show("Please wait while issues are being resolve!")
+        ///     }
+        /// )
+        /// ```
         public func mutate(
             variables gql: TMutation,
             onCompleted: @escaping (TMutation.Data) -> Void = log,
-            onFailure: @escaping (Error) -> Void = log
+            onFailure: @escaping (Fault) -> Void = log
         ) -> Void {
             cancellable = request(
                 gql,
@@ -106,10 +166,18 @@ extension Orfeus {
         }
         
         /// Manage data callback
-        fileprivate func assignData(datum: TMutation.Data) {
+        fileprivate func assignData(datum: TMutation.Data, onSuccess: @escaping (TMutation.Data) -> Void) {
             withAnimation {
-                data = datum
-                isLoading = false
+                state = .succeed(datum)
+                onSuccess(datum)
+            }
+        }
+        
+        /// Handle error
+        fileprivate func handleError(_ err: Fault, onFailure: @escaping (Fault) -> Void) {
+            withAnimation {
+                state = .failed(err)
+                onFailure(err)
             }
         }
         
@@ -117,16 +185,13 @@ extension Orfeus {
         fileprivate func request(
             _ gql: TMutation,
             onSuccess: @escaping (TMutation.Data) -> Void,
-            onFailure: @escaping (Error) -> Void
+            onFailure: @escaping (Fault) -> Void
         ) -> Cancellable {
-            isLoading = true
+            state = .loading
             return Orfeus.shared.perform(
                 mutation: gql,
-                onSuccess: { datum in
-                    self.assignData(datum: datum)
-                    onSuccess(datum)
-                },
-                onError: onFailure
+                onSuccess: { self.assignData(datum: $0, onSuccess: onSuccess) },
+                onError: { self.handleError($0, onFailure: onFailure) }
             )
         }
     }

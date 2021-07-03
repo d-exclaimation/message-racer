@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Apollo
 
 public struct MainView: View {
     @EnvironmentObject var user: User
@@ -32,7 +33,6 @@ public struct MainView: View {
                 }
                 Button {
                     showCreateMenuForm.toggle()
-                    navigate(.main)
                 } label: {
                     buttonLabel(text: "Create a room")
                 }
@@ -42,11 +42,12 @@ public struct MainView: View {
                     buttonLabel(text: "Explore rooms", iconName: "house.circle.fill")
                 }
             }
+            /// Form Create Room
             .sheet(
                 isPresented: $showCreateMenuForm,
                 onDismiss: { showCreateMenuForm = false }
             ) {
-                CreateRoomFormView(isShowing: $showCreateMenuForm)
+                CreateRoomFormView(isShowing: $showCreateMenuForm, createRoom: createNewRoom(roomID:username:))
             }
         }
     }
@@ -66,6 +67,13 @@ public struct MainView: View {
         .padding()
         .background(Color.white)
         .cornerRadius(8)
+    }
+    
+    /// Create room callback for the form
+    private func createNewRoom(roomID: GraphQLID, username: String) -> Void {
+        showCreateMenuForm = false
+        user.login(username: username)
+        navigate(.room(id: UUID(uuidString: roomID) ?? UUID()))
     }
 }
 

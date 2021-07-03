@@ -11,8 +11,11 @@ import SwiftUI
 public struct RoomView: View {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     
+    @EnvironmentObject var user: User
+    
     let color: Color
     let uuid: UUID
+    let navigate: (MainRoute) -> Void
     let timestamp: Date = Date()
     let textMessage: [(String, Bool)] = [
         "a",
@@ -58,7 +61,7 @@ public struct RoomView: View {
                         }
                         
                         // End of text message
-                        Text(playerPos == textMessage.count ? "Well done! \(Int(wpm)) wpm" : "End of line......")
+                        Text(playerPos == textMessage.count ? "Well done \(user.username)! \(Int(wpm)) wpm" : "\(user.username)'s end of the line ...")
                             .fontWeight(.thin)
                             .padding()
                             .flippedUpsideDown()
@@ -84,6 +87,11 @@ public struct RoomView: View {
                     .padding()
                     
                 }
+            }
+        }
+        .onAppear {
+            if !user.isLoggedIn {
+                navigate(.main)
             }
         }
     }
@@ -121,6 +129,7 @@ public struct RoomView: View {
 
 struct RoomView_Preview: PreviewProvider {
     static var previews: some View {
-        RoomView(color: .init(UIColor.mediumPurple), uuid: UUID())
+        RoomView(color: .init(UIColor.mediumPurple), uuid: UUID()) { _ in }
+            .environmentObject(User())
     }
 }

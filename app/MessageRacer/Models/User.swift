@@ -21,4 +21,13 @@ public class User: ObservableObject {
         isLoggedIn = false
         username = ""
     }
+    
+    public func login(username: String) {
+        self.username = username
+        self.isLoggedIn = true
+    }
+    
+    public func logout() {
+        self.isLoggedIn = false
+    }
 }
