@@ -9,8 +9,8 @@ defmodule MessageRacerWeb.Event.Start do
   @moduledoc """
   Start Event struct
   """
-  @enforce_keys [:type, :payload]
-  defstruct [:type, :payload]
+  @enforce_keys [:type, :payload, :id]
+  defstruct [:type, :payload, :id]
 
   @typedoc """
   StartEvent Struct Type

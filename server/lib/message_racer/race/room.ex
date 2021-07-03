@@ -19,7 +19,7 @@ defmodule MessageRacer.Race.Room do
   @doc false
   def changeset(room, attrs) do
     room
-    |> cast(attrs, [])
+    |> cast(attrs, [:player_count])
     |> validate_required([])
   end
 end

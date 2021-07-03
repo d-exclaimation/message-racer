@@ -26,6 +26,14 @@ defmodule MessageRacerWeb.RoomSchema do
     end
   end
 
+  @desc "Host creation object"
+  object :host_info do
+    @desc "Host player who created the room"
+    field :host, non_null(:player)
+    @desc "Room created"
+    field :room, non_null(:room)
+  end
+
   @desc "Unvalidated changes input"
   input_object :delta_input do
     @desc "Room ID to sent this to"

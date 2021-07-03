@@ -10,7 +10,7 @@ defmodule MessageRacerWeb.RoomResolver do
   Room GraphQL Resolver
   """
   use Absinthe.Schema.Notation
-  import MessageRacerWeb.Graph, only: [ok: 1, error: 1]
+  import MessageRacerWeb.Graph, only: [ok: 1, error: 1, ok_auth: 2]
   alias Absinthe.Resolution, as: Res
   alias MessageRacer.{RoomMutations, RoomQueries, PlayerMutations, Race, InMemory}
   alias Race.{Room, Player}
@@ -24,9 +24,12 @@ defmodule MessageRacerWeb.RoomResolver do
 
   object :room_mutations do
     @desc "Create a new room"
-    field :create_room, :room do
+    field :create_room, non_null(:host_info) do
       arg(:user_info, non_null(:join_input))
       resolve(&create_room/2)
+
+      # Setup for session auth
+      middleware(&setup_auth/2)
     end
 
     @desc "Join a room with a player information"
@@ -114,13 +117,13 @@ defmodule MessageRacerWeb.RoomResolver do
   @doc """
   Create room resolver
   """
-  @spec create_room(map(), Res.t()) :: Graph.returned(Room.t())
-  def create_room(_args, _res) do
-    case RoomMutations.create(%{}) do
-      {:ok, %Room{} = room} ->
-        room
-        |> ok()
-
+  @spec create_room(%{user_info: map()}, Res.t()) :: Graph.returned(Room.t())
+  def create_room(%{user_info: info}, _res) do
+    with {:ok, %Room{id: room_id} = room} <- RoomMutations.create(%{"player_count" => 1}),
+         {:ok, %Player{} = user} <- PlayerMutations.create_player(room_id, info) do
+      %{room: room, host: user}
+      |> ok_auth(user)
+    else
       {:error, %Ecto.Changeset{errors: errors}} ->
         errors
         |> inspect()
@@ -140,11 +143,12 @@ defmodule MessageRacerWeb.RoomResolver do
       if players == 4 do
         Timing.async_timeout(2000, fn ->
           payload = InMemory.start(id)
-          Graph.dispatch(%Start{type: :start, payload: payload}, game_cycle: id)
+          Graph.dispatch(%Start{type: :start, payload: payload, id: uuid}, game_cycle: id)
         end)
       end
 
-      user |> ok()
+      user
+      |> ok_auth(user)
     else
       :error -> "Invalid UUID" |> error()
       {:error, %Ecto.Changeset{errors: err}} -> inspect(err) |> error()
@@ -166,8 +170,9 @@ defmodule MessageRacerWeb.RoomResolver do
 
   # Add session to context, to be fetch in the Blueprint
   @spec setup_auth(Res.t(), any()) :: Res.t()
-  defp setup_auth(%Res{value: %Player{id: id}} = res, _conf) do
+  defp setup_auth(%Res{value: %{auth: %Player{id: id}, value: payload}} = res, _conf) do
     res
+    |> Map.update(:value, payload, fn _ -> payload end)
     |> Map.update(:context, %{}, &Map.merge(&1, %{session_id: id}))
   end
 

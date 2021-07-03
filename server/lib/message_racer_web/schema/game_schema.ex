@@ -10,6 +10,8 @@ defmodule MessageRacerWeb.GameSchema do
   Game Event Schema
   """
   use Absinthe.Schema.Notation
+  import MessageRacerWeb.Graph, only: [ok: 1]
+  alias MessageRacer.RoomQueries
   alias MessageRacerWeb.Event.{Delta, Start, End}
 
   @desc "A game event"
@@ -40,7 +42,16 @@ defmodule MessageRacerWeb.GameSchema do
   @desc "Event to trigger start for each player"
   object :start_event do
     field :type, non_null(:event_type)
+    field :id, non_null(:id)
     field :payload, non_null(list_of(non_null(:string)))
+    # All the users or just the room ID
+    field :room, non_null(:room) do
+      resolve(fn %{id: id}, _, _ ->
+        id
+        |> RoomQueries.get()
+        |> ok()
+      end)
+    end
   end
 
   @desc "Event type"

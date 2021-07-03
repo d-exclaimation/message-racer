@@ -48,6 +48,12 @@ defmodule MessageRacerWeb.Graph do
   def ok_else(payload, _fallback), do: {:ok, payload}
 
   @doc """
+  Ok tuple with payload and auth for middleware
+  """
+  @spec ok_auth(a, b) :: {:ok, %{value: a, auth: b}} when a: var, b: var
+  def ok_auth(payload, auth), do: {:ok, %{value: payload, auth: auth}}
+
+  @doc """
   Dispatch a payload to subscription(s)
   """
   @spec dispatch(payload(), subscription_keys() | Absinthe.Resolution.t()) :: :ok

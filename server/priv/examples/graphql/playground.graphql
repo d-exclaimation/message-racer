@@ -1,21 +1,27 @@
-mutation JoinRoom($id: ID!) {
-  joinRoom(roomId: $id, userInfo: { username: "d" }) {
+mutation JoinRoom($id: ID!, $username: String!) {
+  joinRoom(roomId: $id, userInfo: { username: $username }) {
     id
     username
   }
 }
-mutation SendChanges($id: ID!) {
+mutation SendChanges($id: ID!, $username: String!, $changes: Changes!) {
   sendDelta(
     delta: {
       roomId: $id
       username: "d"
-      changes: { index: 10, word: "Ameliorated bifurcated data-warehouse" }
+      changes: $changes # { index: 10, word: "Ameliorated bifurcated data-warehouse" }
     }
   )
 }
-mutation CreateRoom {
-  createRoom(userInfo: { username: "vincent" }) {
-    id
+mutation CreateRoom($username: String!) {
+  createRoom(userInfo: { username: $username }) {
+    host {
+      id
+      username
+    }
+    room {
+      id
+    }
   }
 }
 subscription RoomSubscription($id: ID!) {
@@ -33,6 +39,11 @@ subscription RoomSubscription($id: ID!) {
     ... on StartEvent {
       type
       payload
+      room {
+        players {
+          username
+        }
+      }
     }
   }
 }
