@@ -10,7 +10,7 @@ defmodule MessageRacerWeb.GraphqlSocket do
   """
   use SubscriptionsTransportWS.Socket,
     schema: MessageRacerWeb.Schema,
-    keep_alive: 1000
+    keep_alive: 3_600_000
 
   @doc """
   Callback to connect through the websocket

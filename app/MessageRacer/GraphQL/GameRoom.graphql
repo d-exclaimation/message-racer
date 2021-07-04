@@ -1,0 +1,23 @@
+subscription RoomSubscription($id: ID!) {
+  gameCycle(roomId: $id) {
+    ... on DeltaEvent {
+      index
+      type
+      username
+      word
+    }
+    ... on EndEvent {
+      type
+      winner
+    }
+    ... on StartEvent {
+      type
+      payload
+      room {
+        players {
+          username
+        }
+      }
+    }
+  }
+}

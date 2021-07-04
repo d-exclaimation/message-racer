@@ -61,7 +61,15 @@ defmodule MessageRacerWeb.RoomResolver do
     @desc "Game cycle update"
     field :game_cycle, non_null(:game_event) do
       arg(:room_id, non_null(:id))
-      config(fn %{room_id: room_id}, _ -> {:ok, topic: room_id} end)
+
+      config(fn
+        %{room_id: room_id}, _ ->
+          IO.puts(room_id)
+          {:ok, topic: room_id}
+
+        _, _ ->
+          {:ok, topic: "lobby"}
+      end)
 
       resolve(&game_cycle/3)
     end
@@ -112,7 +120,7 @@ defmodule MessageRacerWeb.RoomResolver do
   Game cycle subscriptions
   """
   @spec game_cycle(map(), map(), Res.t()) :: Graph.returned(game_event())
-  def game_cycle(p, _, _), do: p |> ok()
+  def game_cycle(p, _, _), do: p |> tap(&IO.inspect/1) |> ok()
 
   @doc """
   Create room resolver
@@ -141,7 +149,7 @@ defmodule MessageRacerWeb.RoomResolver do
          {:ok, %Player{} = user} <- PlayerMutations.create_player(uuid, info) do
       # Only send start event once there are 4 players
       if players == 4 do
-        Timing.async_timeout(2000, fn ->
+        Timing.async_timeout(5000, fn ->
           payload = InMemory.start(id)
           Graph.dispatch(%Start{type: :start, payload: payload, id: uuid}, game_cycle: id)
         end)
