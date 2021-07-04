@@ -11,6 +11,7 @@
 		5339DC632690B53300856830 /* ActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 5339DC622690B53300856830 /* ActivityIndicatorView */; };
 		537D2072268B11A70093D6D8 /* LobbyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537D2071268B11A70093D6D8 /* LobbyView.swift */; };
 		537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537D2073268B137C0093D6D8 /* RoomPreview.swift */; };
+		5397F33326917FDC005D1913 /* OrfeusSuspense.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5397F33226917FDC005D1913 /* OrfeusSuspense.swift */; };
 		53AE31C2267E040F0025A4E9 /* RoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AE31C1267E040F0025A4E9 /* RoomView.swift */; };
 		53AE31C4267E0BB90025A4E9 /* Color+RGBA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AE31C3267E0BB90025A4E9 /* Color+RGBA.swift */; };
 		53AE31C6267E272E0025A4E9 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53AE31C5267E272E0025A4E9 /* ChatMessage.swift */; };
@@ -29,6 +30,7 @@
 		53B45E25267C9C16007BF7DE /* Index.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B45E24267C9C16007BF7DE /* Index.swift */; };
 		53B45E27267CB5C1007BF7DE /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B45E26267CB5C1007BF7DE /* User.swift */; };
 		53B45E2A267CB9D6007BF7DE /* NavView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B45E29267CB9D6007BF7DE /* NavView.swift */; };
+		53D66C6D2691913E0005BB84 /* SuspensingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D66C6C2691913E0005BB84 /* SuspensingView.swift */; };
 		53DB3271268D9D67006CE332 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 53DB3270268D9D67006CE332 /* Apollo */; };
 		53DB3273268D9D67006CE332 /* ApolloAPI in Frameworks */ = {isa = PBXBuildFile; productRef = 53DB3272268D9D67006CE332 /* ApolloAPI */; };
 		53DB3275268D9D67006CE332 /* ApolloCodegenLib in Frameworks */ = {isa = PBXBuildFile; productRef = 53DB3274268D9D67006CE332 /* ApolloCodegenLib */; };
@@ -48,6 +50,7 @@
 		537D2071268B11A70093D6D8 /* LobbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyView.swift; sourceTree = "<group>"; };
 		537D2073268B137C0093D6D8 /* RoomPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomPreview.swift; sourceTree = "<group>"; };
 		53874CBD267F4C7500918C7D /* MessageRacer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MessageRacer.entitlements; sourceTree = "<group>"; };
+		5397F33226917FDC005D1913 /* OrfeusSuspense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrfeusSuspense.swift; sourceTree = "<group>"; };
 		53AE31C1267E040F0025A4E9 /* RoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomView.swift; sourceTree = "<group>"; };
 		53AE31C3267E0BB90025A4E9 /* Color+RGBA.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Color+RGBA.swift"; sourceTree = "<group>"; };
 		53AE31C5267E272E0025A4E9 /* ChatMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
@@ -67,6 +70,7 @@
 		53B45E24267C9C16007BF7DE /* Index.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Index.swift; sourceTree = "<group>"; };
 		53B45E26267CB5C1007BF7DE /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		53B45E29267CB9D6007BF7DE /* NavView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavView.swift; sourceTree = "<group>"; };
+		53D66C6C2691913E0005BB84 /* SuspensingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuspensingView.swift; sourceTree = "<group>"; };
 		53DB327B268DA0B5006CE332 /* schema.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = schema.json; sourceTree = "<group>"; };
 		53DB327E268DA205006CE332 /* Orfeus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Orfeus.swift; sourceTree = "<group>"; };
 		53DB3280268DA22B006CE332 /* AvailableRooms.graphql */ = {isa = PBXFileReference; lastKnownFileType = text; path = AvailableRooms.graphql; sourceTree = "<group>"; };
@@ -97,6 +101,7 @@
 		53135172268DFE1900D21A2E /* Orfeus */ = {
 			isa = PBXGroup;
 			children = (
+				5397F33126917FB3005D1913 /* Views */,
 				53135175268E02BE00D21A2E /* QueryAgent.swift */,
 				53AFC081268EC45F00C60467 /* MutationAgent.swift */,
 				53AFC083268ED5A900C60467 /* Agent.swift */,
@@ -112,6 +117,15 @@
 				537D2073268B137C0093D6D8 /* RoomPreview.swift */,
 			);
 			path = Lobby;
+			sourceTree = "<group>";
+		};
+		5397F33126917FB3005D1913 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5397F33226917FDC005D1913 /* OrfeusSuspense.swift */,
+				53D66C6C2691913E0005BB84 /* SuspensingView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		53AE31C0267E03FC0025A4E9 /* Room */ = {
@@ -382,7 +396,9 @@
 				53DB328D268DC4EF006CE332 /* Plist.swift in Sources */,
 				53DB3286268DBEFF006CE332 /* LobbyRoom.swift in Sources */,
 				53AE31C6267E272E0025A4E9 /* ChatMessage.swift in Sources */,
+				53D66C6D2691913E0005BB84 /* SuspensingView.swift in Sources */,
 				53AFC08B268F1B0700C60467 /* UserInfoView.swift in Sources */,
+				5397F33326917FDC005D1913 /* OrfeusSuspense.swift in Sources */,
 				537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */,
 				53B45E13267C84F5007BF7DE /* ContentView.swift in Sources */,
 				53DB327F268DA205006CE332 /* Orfeus.swift in Sources */,

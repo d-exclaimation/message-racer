@@ -28,7 +28,7 @@ public class Orfeus {
             query: query,
             contextIdentifier: contextIdentifier,
             queue: queue
-        ) { self.resultHandler(res: $0, onSuccess: onSuccess, onError: onError) }
+        ) { [weak self] res in self?.resultHandler(res: res, onSuccess: onSuccess, onError: onError) }
     }
     
     /// Fetch request and perform action according for each time cache is changed
@@ -42,7 +42,7 @@ public class Orfeus {
         apollo.watch(
             query: query,
             callbackQueue: queue
-        ) { self.resultHandler(res: $0, onSuccess: onSuccess, onError: onError) }
+        ) { [weak self] res in self?.resultHandler(res: res, onSuccess: onSuccess, onError: onError) }
     }
     
     /// Perform request and handle result accordingly
@@ -58,9 +58,10 @@ public class Orfeus {
             mutation: mutation,
             publishResultToStore: storeResult,
             queue: queue
-        ) { self.resultHandler(res: $0, onSuccess: onSuccess, onError: onError) }
+        ) { [weak self] res in self?.resultHandler(res: res, onSuccess: onSuccess, onError: onError) }
     }
         
+    /// Handle result of each possible request
     private func resultHandler<Data>(
         res: Result<GraphQLResult<Data>, Error>,
         onSuccess: @escaping (Data) -> Void,
@@ -69,7 +70,7 @@ public class Orfeus {
         switch res {
         case.success(let resp):
             if let errors = resp.errors {
-                return onError(Fault.graphqlErrors(errors: errors))
+                return onError(.graphqlErrors(errors: errors))
             }
             
             if let data = resp.data {
@@ -79,9 +80,9 @@ public class Orfeus {
                 return
             }
             
-            return onError(Fault.nothingHappened)
+            return onError(.nothingHappened)
         case .failure(let err):
-            onError(Fault.requestFailed(reason: err.localizedDescription))
+            onError(.requestFailed(reason: err.localizedDescription))
         }
     }
     
@@ -102,7 +103,20 @@ public class Orfeus {
                 return "Nothing happened"
             }
         }
+        
+        /// GraphQL Errors shorthand
+        public var errors: [GraphQLError] {
+            switch self {
+            case .graphqlErrors(errors: let errors): return errors
+            case .requestFailed(reason: let reason): return [GraphQLError(reason: reason)]
+            case .nothingHappened: return []
+            }
+        }
     }
 }
 
-
+extension GraphQLError {
+    init(reason: String) {
+        self.init(["message": reason])
+    }
+}

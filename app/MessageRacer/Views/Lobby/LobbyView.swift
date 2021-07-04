@@ -41,16 +41,7 @@ public struct LobbyView: View {
                 .foregroundColor(color)
                 .ignoresSafeArea(.all)
             
-            switch roomAgent.state {
-            case .idle:
-                EmptyView()
-            case .loading:
-                ActivityIndicatorView(isVisible: Binding.constant(true), type: .rotatingDots)
-                    .frame(maxWidth: 50, maxHeight: 50)
-                    .foregroundColor(Color(UIColor.darkPurple))
-                    .transition(.opacity)
-            case .succeed(let data):
-                // All the Rooms available
+            OrfeusSuspense(state: roomAgent.state, fallback: loading) { data in
                 ScrollView {
                     LazyVStack {
                         ForEach(data.availableRooms) { room in
@@ -68,23 +59,29 @@ public struct LobbyView: View {
                     isPresented: $showForm,
                     onDismiss: { showForm = false }
                 ) {
-                    UserInfoView(isShowing: $showForm, errorMessage: $errorMessage, isLoading: joinAgent.isLoading) { username in
-                        guard let roomID = roomID else { return }
-                        joinAgent.mutate(
-                            variables: JoinRoomMutation(id: roomID, username: username),
-                            onCompleted: handleSuccess(data:),
-                            onFailure: { errorMessage = $0.message }
-                        )
-                        user.login(username: username)
-                    }
+                    UserInfoView(isShowing: $showForm, errorMessage: $errorMessage, isLoading: joinAgent.isLoading, onSubmit: onFormSubmit)
                 }
-            case .failed(let err):
-                Text(err.message)
-                    .transition(.scale(scale: 0.3).combined(with: .opacity))
             }
-            
         }
     }
+    
+    private var loading: some View {
+        ActivityIndicatorView(isVisible: Binding.constant(true), type: .rotatingDots)
+            .frame(maxWidth: 50, maxHeight: 50)
+            .foregroundColor(Color(UIColor.darkPurple))
+            .transition(.opacity)
+    }
+    
+    private func onFormSubmit(_ username: String) -> Void {
+        guard let roomID = roomID else { return }
+        joinAgent.mutate(
+            variables: JoinRoomMutation(id: roomID, username: username),
+            onCompleted: handleSuccess(data:),
+            onFailure: { errorMessage = $0.message }
+        )
+        user.login(username: username)
+    }
+    
     private func handleSuccess(data: JoinRoomMutation.Data) -> Void {
         guard let roomID = UUID(uuidString: data.joinRoom.id) else { return }
         navigate(.room(id: roomID))

@@ -56,16 +56,19 @@ public struct MainView: View {
                 isPresented: $showCreateMenuForm,
                 onDismiss: { showCreateMenuForm = false }
             ) {
-                UserInfoView(isShowing: $showCreateMenuForm, errorMessage: $errorMessage, isLoading: createAgent.isLoading) { username in
-                    createAgent.mutate(
-                        variables: CreateRoomMutation(username: username),
-                        onCompleted: handleSuccess(data:),
-                        onFailure: { errorMessage = $0.message }
-                    )
-                }
+                UserInfoView(isShowing: $showCreateMenuForm, errorMessage: $errorMessage, isLoading: createAgent.isLoading, onSubmit: onFormSubmit)
             }
         }
     }
+    
+    private func onFormSubmit(_ username: String) -> Void {
+        createAgent.mutate(
+            variables: CreateRoomMutation(username: username),
+            onCompleted: handleSuccess(data:),
+            onFailure: { errorMessage = $0.message }
+        )
+    }
+    
     /// Handle creation success with joining room
     private func handleSuccess(data: CreateRoomMutation.Data) -> Void {
         let roomId = data.createRoom.room.id

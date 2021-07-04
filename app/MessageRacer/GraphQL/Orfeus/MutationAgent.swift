@@ -190,8 +190,8 @@ extension Orfeus {
             state = .loading
             return Orfeus.shared.perform(
                 mutation: gql,
-                onSuccess: { self.assignData(datum: $0, onSuccess: onSuccess) },
-                onError: { self.handleError($0, onFailure: onFailure) }
+                onSuccess: { [weak self] data in self?.assignData(datum: data, onSuccess: onSuccess) },
+                onError: { [weak self] err in self?.handleError(err, onFailure: onFailure) }
             )
         }
     }
