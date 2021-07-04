@@ -7,13 +7,16 @@
 
 import Foundation
 import Apollo
+import ApolloWebSocket
 
 public class Orfeus {
     /// Shared singleton instance of Orfeus
     public static let shared = Orfeus()
     
+    public var createClient: () -> ApolloClient = { ApolloClient(url: URL(string: "http://localhost:8080")!) }
+    
     /// Apollo client wrapper
-    public lazy var apollo = ApolloClient(url: URL(string: Preferences.shared.api)!)
+    public lazy var apollo = createClient()
     
     /// Fetch request and perform action according
     public func fetch<TQuery: GraphQLQuery>(
@@ -26,6 +29,7 @@ public class Orfeus {
         
         apollo.fetch(
             query: query,
+            cachePolicy: .fetchIgnoringCacheCompletely,
             contextIdentifier: contextIdentifier,
             queue: queue
         ) { [weak self] res in self?.resultHandler(res: res, onSuccess: onSuccess, onError: onError) }
@@ -59,6 +63,19 @@ public class Orfeus {
             publishResultToStore: storeResult,
             queue: queue
         ) { [weak self] res in self?.resultHandler(res: res, onSuccess: onSuccess, onError: onError) }
+    }
+    
+    /// Subscribe to changes and perform action accordingly
+    public func subscribe<TSubscription: GraphQLSubscription>(
+        subscription: TSubscription,
+        queue: DispatchQueue = .main,
+        onSuccess: @escaping (TSubscription.Data) -> Void,
+        onError: @escaping (Fault) -> Void
+    ) -> Cancellable {
+        return apollo.subscribe(
+            subscription: subscription,
+            queue: queue
+        ) { [weak self] res in self?.resultHandler(res: res, onSuccess: onSuccess, onError: onError)}
     }
         
     /// Handle result of each possible request

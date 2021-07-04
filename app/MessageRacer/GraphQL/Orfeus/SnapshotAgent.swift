@@ -1,5 +1,5 @@
 //
-//  SubscriptionAgent.swift
+//  SnapshotAgent.swift
 //  MessageRacer
 //
 //  Created by Vincent on 7/4/21.
@@ -10,12 +10,14 @@ import Apollo
 import SwiftUI
 
 extension Orfeus {
-    /// GraphQL Subscription Observable to manage Query State
+    /// GraphQL Subscription Observable to manage snapshot data
     ///
-    /// Usage: initialize and load
+    /// By default, it will not immediatelly listen, unless `subscribe` method is called
+    ///
+    /// Usage: initialize and subscribe
     /// ```swift
     /// @StateObject
-    /// var someSubscription = SubscriptionAgent(SomeGraphQLSubscription.self)
+    /// var someSubscription = SnapshotAgent(subscription: SomeGraphQLSubscription.self)
     ///
     /// func startSubscription() {
     ///     someSubscription.subscribe(
@@ -24,7 +26,7 @@ extension Orfeus {
     ///     )
     /// }
     ///
-    /// func onReceive(_ res: Result<SomeGraphQLSubscription.Data, Fault>) -> SubscriptionAgent<SomeGraphQLSubscription>.ReceivedPackage  {
+    /// func onReceive(_ res: Result<SomeGraphQLSubscription.Data, Fault>) -> SnapshotAgent<SomeGraphQLSubscription>.ReceivedPackage  {
     ///     switch res {
     ///     case .succeed(let data): return .update(data)
     ///     case .failure(_): return .halt
@@ -55,7 +57,7 @@ extension Orfeus {
         /// }
         /// ```
         @Published
-        public var state: AgentState<TSubscription.Data> = .idle
+        public var state: AgentState<Snapshot> = .idle
         
         /// Network request cancellable request
         ///
@@ -64,7 +66,7 @@ extension Orfeus {
         public var cancellable: Cancellable? = nil
         
         /// Data from the Query managed by the Agent
-        public var data: TSubscription.Data? {
+        public var data: Snapshot? {
             state.value
         }
         
@@ -79,14 +81,15 @@ extension Orfeus {
         }
         
         /// Return value given from receiver
-        public enum ReceivedPackage {
+        public enum ReturnedSnapshot {
             case halt
-            case update(TSubscription.Data)
+            case update(Snapshot)
             case fault(Fault)
         }
         
         /// Function to handle incoming data
-        public typealias Receiver = (Result<TSubscription.Data, Fault>) -> ReceivedPackage
+        public typealias SnapshotReceiver = (Result<Snapshot, Fault>) -> ReturnedSnapshot
+        public typealias Snapshot = TSubscription.Data
         
         // MARK: - Public methods / actions
         
@@ -95,7 +98,7 @@ extension Orfeus {
         /// **Example: **
         /// ```swift
         /// @StateObject
-        /// var someSubscription = SubscriptionAgent(SomeGraphQLSubscription.self)
+        /// var someSubscription = SnapshotAgent(SomeGraphQLSubscription.self)
         ///
         /// func startSubscription() {
         ///     someSubscription.subscribe(
@@ -104,7 +107,7 @@ extension Orfeus {
         ///     )
         /// }
         ///
-        /// func onReceive(_ res: Result<SomeGraphQLSubscription.Data, Fault>) -> SubscriptionAgent<SomeGraphQLSubscription>.ReceivedPackage  {
+        /// func onReceive(_ res: Result<SomeGraphQLSubscription.Data, Fault>) -> SnapshotAgent<SomeGraphQLSubscription>.ReceivedPackage  {
         ///     switch res {
         ///     case .succeed(let data): return .update(data)
         ///     case .failure(_): return .halt
@@ -113,7 +116,7 @@ extension Orfeus {
         /// ```
         public func subscribe(
             subscription: TSubscription,
-            onReceive: @escaping Receiver
+            onReceive: @escaping SnapshotReceiver
         ) -> Void {
             cancellable = request(operation: subscription, onReceive: onReceive)
         }
@@ -137,7 +140,7 @@ extension Orfeus {
         /// Handle receive
         fileprivate func handleReceive(
             _ res: Result<TSubscription.Data, Fault>,
-            onReceive: @escaping Receiver
+            onReceive: @escaping SnapshotReceiver
         ) {
             withAnimation {
                 switch onReceive(res) {
@@ -154,20 +157,20 @@ extension Orfeus {
         /// GraphQL Network Request
         fileprivate func request(
             operation: TSubscription,
-            onReceive: @escaping Receiver
+            onReceive: @escaping SnapshotReceiver
         ) -> Cancellable {
             state = .loading
             return Orfeus.shared.subscribe(
                 subscription: operation,
-                onSuccess: { _ in },
-                onError: { _ in }
+                onSuccess: { [weak self] data in self?.handleReceive(.success(data), onReceive: onReceive) },
+                onError: { [weak self] fault in self?.handleReceive(.failure(fault), onReceive: onReceive) }
             )
         }
     }
     
     /// Use GraphQL Subscription Agent
     public static func agent<TSubscription: GraphQLSubscription>(
-        subscription gql: TSubscription.Type
+        snapshot gql: TSubscription.Type
     ) -> SnapshotAgent<TSubscription> {
         SnapshotAgent(subscription: gql)
     }

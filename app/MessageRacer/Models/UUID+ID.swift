@@ -6,3 +6,8 @@
 //
 
 import Foundation
+extension UUID {
+    var id: String {
+        uuidString.lowercased()
+    }
+}

@@ -61,7 +61,6 @@ struct ContentView: View {
         switch route {
         case .room(let id):
             RoomView(
-                color: Color(UIColor.mediumPurple),
                 uuid: id,
                 navigate: navigate(to:)
             )

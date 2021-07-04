@@ -1,4 +1,4 @@
-subscription RoomSubscription($id: ID!) {
+subscription GameRoom($id: ID!) {
   gameCycle(roomId: $id) {
     ... on DeltaEvent {
       index

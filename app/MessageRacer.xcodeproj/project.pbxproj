@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		53135176268E02BE00D21A2E /* QueryAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53135175268E02BE00D21A2E /* QueryAgent.swift */; };
+		533310F72691D334008E59AE /* SnapshotAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533310F62691D334008E59AE /* SnapshotAgent.swift */; };
+		533310F92691DA4A008E59AE /* StreamAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533310F82691DA4A008E59AE /* StreamAgent.swift */; };
+		533310FB2691E9BA008E59AE /* GameRoom.graphql in Resources */ = {isa = PBXBuildFile; fileRef = 533310FA2691E9BA008E59AE /* GameRoom.graphql */; };
+		533310FD2691F13D008E59AE /* GameCycleEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533310FC2691F13D008E59AE /* GameCycleEnum.swift */; };
+		533310FF2691F8C7008E59AE /* OrfeusOnChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 533310FE2691F8C7008E59AE /* OrfeusOnChange.swift */; };
+		5333110126922C81008E59AE /* UUID+ID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5333110026922C81008E59AE /* UUID+ID.swift */; };
 		5339DC632690B53300856830 /* ActivityIndicatorView in Frameworks */ = {isa = PBXBuildFile; productRef = 5339DC622690B53300856830 /* ActivityIndicatorView */; };
 		537D2072268B11A70093D6D8 /* LobbyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537D2071268B11A70093D6D8 /* LobbyView.swift */; };
 		537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 537D2073268B137C0093D6D8 /* RoomPreview.swift */; };
@@ -47,6 +53,12 @@
 
 /* Begin PBXFileReference section */
 		53135175268E02BE00D21A2E /* QueryAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryAgent.swift; sourceTree = "<group>"; };
+		533310F62691D334008E59AE /* SnapshotAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotAgent.swift; sourceTree = "<group>"; };
+		533310F82691DA4A008E59AE /* StreamAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamAgent.swift; sourceTree = "<group>"; };
+		533310FA2691E9BA008E59AE /* GameRoom.graphql */ = {isa = PBXFileReference; lastKnownFileType = text; path = GameRoom.graphql; sourceTree = "<group>"; };
+		533310FC2691F13D008E59AE /* GameCycleEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCycleEnum.swift; sourceTree = "<group>"; };
+		533310FE2691F8C7008E59AE /* OrfeusOnChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrfeusOnChange.swift; sourceTree = "<group>"; };
+		5333110026922C81008E59AE /* UUID+ID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UUID+ID.swift"; sourceTree = "<group>"; };
 		537D2071268B11A70093D6D8 /* LobbyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LobbyView.swift; sourceTree = "<group>"; };
 		537D2073268B137C0093D6D8 /* RoomPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomPreview.swift; sourceTree = "<group>"; };
 		53874CBD267F4C7500918C7D /* MessageRacer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MessageRacer.entitlements; sourceTree = "<group>"; };
@@ -106,6 +118,8 @@
 				53AFC081268EC45F00C60467 /* MutationAgent.swift */,
 				53AFC083268ED5A900C60467 /* Agent.swift */,
 				53AFC085268EDF8300C60467 /* AwaitingAgent.swift */,
+				533310F62691D334008E59AE /* SnapshotAgent.swift */,
+				533310F82691DA4A008E59AE /* StreamAgent.swift */,
 			);
 			path = Orfeus;
 			sourceTree = "<group>";
@@ -124,6 +138,7 @@
 			children = (
 				5397F33226917FDC005D1913 /* OrfeusSuspense.swift */,
 				53D66C6C2691913E0005BB84 /* SuspensingView.swift */,
+				533310FE2691F8C7008E59AE /* OrfeusOnChange.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -219,6 +234,7 @@
 				53AE31C3267E0BB90025A4E9 /* Color+RGBA.swift */,
 				53B45E26267CB5C1007BF7DE /* User.swift */,
 				53DB3285268DBEFF006CE332 /* LobbyRoom.swift */,
+				5333110026922C81008E59AE /* UUID+ID.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -261,6 +277,8 @@
 				53DB3280268DA22B006CE332 /* AvailableRooms.graphql */,
 				53AFC07F268EBFDF00C60467 /* CreateRoom.graphql */,
 				53AFC087268F144500C60467 /* JoinRoom.graphql */,
+				533310FA2691E9BA008E59AE /* GameRoom.graphql */,
+				533310FC2691F13D008E59AE /* GameCycleEnum.swift */,
 			);
 			path = GraphQL;
 			sourceTree = "<group>";
@@ -359,6 +377,7 @@
 				53DB327C268DA0B5006CE332 /* schema.json in Resources */,
 				53B45E15267C84F7007BF7DE /* Assets.xcassets in Resources */,
 				53AFC088268F144500C60467 /* JoinRoom.graphql in Resources */,
+				533310FB2691E9BA008E59AE /* GameRoom.graphql in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -392,6 +411,7 @@
 			files = (
 				53AFC086268EDF8300C60467 /* AwaitingAgent.swift in Sources */,
 				537D2072268B11A70093D6D8 /* LobbyView.swift in Sources */,
+				533310FF2691F8C7008E59AE /* OrfeusOnChange.swift in Sources */,
 				53B45E2A267CB9D6007BF7DE /* NavView.swift in Sources */,
 				53DB328D268DC4EF006CE332 /* Plist.swift in Sources */,
 				53DB3286268DBEFF006CE332 /* LobbyRoom.swift in Sources */,
@@ -400,8 +420,10 @@
 				53AFC08B268F1B0700C60467 /* UserInfoView.swift in Sources */,
 				5397F33326917FDC005D1913 /* OrfeusSuspense.swift in Sources */,
 				537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */,
+				533310F92691DA4A008E59AE /* StreamAgent.swift in Sources */,
 				53B45E13267C84F5007BF7DE /* ContentView.swift in Sources */,
 				53DB327F268DA205006CE332 /* Orfeus.swift in Sources */,
+				533310FD2691F13D008E59AE /* GameCycleEnum.swift in Sources */,
 				53DB3284268DA392006CE332 /* API.swift in Sources */,
 				53AE31C2267E040F0025A4E9 /* RoomView.swift in Sources */,
 				53B45E25267C9C16007BF7DE /* Index.swift in Sources */,
@@ -410,8 +432,10 @@
 				53AE31CA267E27770025A4E9 /* FlippedUpsideDown.swift in Sources */,
 				53AFC084268ED5A900C60467 /* Agent.swift in Sources */,
 				53B45E27267CB5C1007BF7DE /* User.swift in Sources */,
+				5333110126922C81008E59AE /* UUID+ID.swift in Sources */,
 				53B45E11267C84F5007BF7DE /* MessageRacerApp.swift in Sources */,
 				53AFC082268EC45F00C60467 /* MutationAgent.swift in Sources */,
+				533310F72691D334008E59AE /* SnapshotAgent.swift in Sources */,
 				53AE31C9267E27770025A4E9 /* BubbleCarded.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

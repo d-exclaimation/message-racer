@@ -4,6 +4,52 @@
 import Apollo
 import Foundation
 
+/// Event type
+public enum EventType: RawRepresentable, Equatable, Hashable, CaseIterable, Apollo.JSONDecodable, Apollo.JSONEncodable {
+  public typealias RawValue = String
+  case delta
+  case end
+  case start
+  /// Auto generated constant for unknown enum values
+  case __unknown(RawValue)
+
+  public init?(rawValue: RawValue) {
+    switch rawValue {
+      case "DELTA": self = .delta
+      case "END": self = .end
+      case "START": self = .start
+      default: self = .__unknown(rawValue)
+    }
+  }
+
+  public var rawValue: RawValue {
+    switch self {
+      case .delta: return "DELTA"
+      case .end: return "END"
+      case .start: return "START"
+      case .__unknown(let value): return value
+    }
+  }
+
+  public static func == (lhs: EventType, rhs: EventType) -> Bool {
+    switch (lhs, rhs) {
+      case (.delta, .delta): return true
+      case (.end, .end): return true
+      case (.start, .start): return true
+      case (.__unknown(let lhsValue), .__unknown(let rhsValue)): return lhsValue == rhsValue
+      default: return false
+    }
+  }
+
+  public static var allCases: [EventType] {
+    return [
+      .delta,
+      .end,
+      .start,
+    ]
+  }
+}
+
 public final class AvailableRoomsQuery: GraphQLQuery {
   /// The raw GraphQL definition of this operation.
   public let operationDefinition: String =
@@ -345,6 +391,413 @@ public final class CreateRoomMutation: GraphQLMutation {
           }
           set {
             resultMap.updateValue(newValue, forKey: "id")
+          }
+        }
+      }
+    }
+  }
+}
+
+public final class GameRoomSubscription: GraphQLSubscription {
+  /// The raw GraphQL definition of this operation.
+  public let operationDefinition: String =
+    """
+    subscription GameRoom($id: ID!) {
+      gameCycle(roomId: $id) {
+        __typename
+        ... on DeltaEvent {
+          index
+          type
+          username
+          word
+        }
+        ... on EndEvent {
+          type
+          winner
+        }
+        ... on StartEvent {
+          type
+          payload
+          room {
+            __typename
+            players {
+              __typename
+              username
+            }
+          }
+        }
+      }
+    }
+    """
+
+  public let operationName: String = "GameRoom"
+
+  public var id: GraphQLID
+
+  public init(id: GraphQLID) {
+    self.id = id
+  }
+
+  public var variables: GraphQLMap? {
+    return ["id": id]
+  }
+
+  public struct Data: GraphQLSelectionSet {
+    public static let possibleTypes: [String] = ["RootSubscriptionType"]
+
+    public static var selections: [GraphQLSelection] {
+      return [
+        GraphQLField("gameCycle", arguments: ["roomId": GraphQLVariable("id")], type: .nonNull(.object(GameCycle.selections))),
+      ]
+    }
+
+    public private(set) var resultMap: ResultMap
+
+    public init(unsafeResultMap: ResultMap) {
+      self.resultMap = unsafeResultMap
+    }
+
+    public init(gameCycle: GameCycle) {
+      self.init(unsafeResultMap: ["__typename": "RootSubscriptionType", "gameCycle": gameCycle.resultMap])
+    }
+
+    /// Game cycle update
+    public var gameCycle: GameCycle {
+      get {
+        return GameCycle(unsafeResultMap: resultMap["gameCycle"]! as! ResultMap)
+      }
+      set {
+        resultMap.updateValue(newValue.resultMap, forKey: "gameCycle")
+      }
+    }
+
+    public struct GameCycle: GraphQLSelectionSet {
+      public static let possibleTypes: [String] = ["DeltaEvent", "EndEvent", "StartEvent"]
+
+      public static var selections: [GraphQLSelection] {
+        return [
+          GraphQLTypeCase(
+            variants: ["DeltaEvent": AsDeltaEvent.selections, "EndEvent": AsEndEvent.selections, "StartEvent": AsStartEvent.selections],
+            default: [
+              GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
+            ]
+          )
+        ]
+      }
+
+      public private(set) var resultMap: ResultMap
+
+      public init(unsafeResultMap: ResultMap) {
+        self.resultMap = unsafeResultMap
+      }
+
+      public static func makeDeltaEvent(index: Int, type: EventType, username: String, word: String) -> GameCycle {
+        return GameCycle(unsafeResultMap: ["__typename": "DeltaEvent", "index": index, "type": type, "username": username, "word": word])
+      }
+
+      public static func makeEndEvent(type: EventType, winner: String) -> GameCycle {
+        return GameCycle(unsafeResultMap: ["__typename": "EndEvent", "type": type, "winner": winner])
+      }
+
+      public static func makeStartEvent(type: EventType, payload: [String], room: AsStartEvent.Room) -> GameCycle {
+        return GameCycle(unsafeResultMap: ["__typename": "StartEvent", "type": type, "payload": payload, "room": room.resultMap])
+      }
+
+      public var __typename: String {
+        get {
+          return resultMap["__typename"]! as! String
+        }
+        set {
+          resultMap.updateValue(newValue, forKey: "__typename")
+        }
+      }
+
+      public var asDeltaEvent: AsDeltaEvent? {
+        get {
+          if !AsDeltaEvent.possibleTypes.contains(__typename) { return nil }
+          return AsDeltaEvent(unsafeResultMap: resultMap)
+        }
+        set {
+          guard let newValue = newValue else { return }
+          resultMap = newValue.resultMap
+        }
+      }
+
+      public struct AsDeltaEvent: GraphQLSelectionSet {
+        public static let possibleTypes: [String] = ["DeltaEvent"]
+
+        public static var selections: [GraphQLSelection] {
+          return [
+            GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
+            GraphQLField("index", type: .nonNull(.scalar(Int.self))),
+            GraphQLField("type", type: .nonNull(.scalar(EventType.self))),
+            GraphQLField("username", type: .nonNull(.scalar(String.self))),
+            GraphQLField("word", type: .nonNull(.scalar(String.self))),
+          ]
+        }
+
+        public private(set) var resultMap: ResultMap
+
+        public init(unsafeResultMap: ResultMap) {
+          self.resultMap = unsafeResultMap
+        }
+
+        public init(index: Int, type: EventType, username: String, word: String) {
+          self.init(unsafeResultMap: ["__typename": "DeltaEvent", "index": index, "type": type, "username": username, "word": word])
+        }
+
+        public var __typename: String {
+          get {
+            return resultMap["__typename"]! as! String
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "__typename")
+          }
+        }
+
+        public var index: Int {
+          get {
+            return resultMap["index"]! as! Int
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "index")
+          }
+        }
+
+        public var type: EventType {
+          get {
+            return resultMap["type"]! as! EventType
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "type")
+          }
+        }
+
+        public var username: String {
+          get {
+            return resultMap["username"]! as! String
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "username")
+          }
+        }
+
+        public var word: String {
+          get {
+            return resultMap["word"]! as! String
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "word")
+          }
+        }
+      }
+
+      public var asEndEvent: AsEndEvent? {
+        get {
+          if !AsEndEvent.possibleTypes.contains(__typename) { return nil }
+          return AsEndEvent(unsafeResultMap: resultMap)
+        }
+        set {
+          guard let newValue = newValue else { return }
+          resultMap = newValue.resultMap
+        }
+      }
+
+      public struct AsEndEvent: GraphQLSelectionSet {
+        public static let possibleTypes: [String] = ["EndEvent"]
+
+        public static var selections: [GraphQLSelection] {
+          return [
+            GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
+            GraphQLField("type", type: .nonNull(.scalar(EventType.self))),
+            GraphQLField("winner", type: .nonNull(.scalar(String.self))),
+          ]
+        }
+
+        public private(set) var resultMap: ResultMap
+
+        public init(unsafeResultMap: ResultMap) {
+          self.resultMap = unsafeResultMap
+        }
+
+        public init(type: EventType, winner: String) {
+          self.init(unsafeResultMap: ["__typename": "EndEvent", "type": type, "winner": winner])
+        }
+
+        public var __typename: String {
+          get {
+            return resultMap["__typename"]! as! String
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "__typename")
+          }
+        }
+
+        public var type: EventType {
+          get {
+            return resultMap["type"]! as! EventType
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "type")
+          }
+        }
+
+        public var winner: String {
+          get {
+            return resultMap["winner"]! as! String
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "winner")
+          }
+        }
+      }
+
+      public var asStartEvent: AsStartEvent? {
+        get {
+          if !AsStartEvent.possibleTypes.contains(__typename) { return nil }
+          return AsStartEvent(unsafeResultMap: resultMap)
+        }
+        set {
+          guard let newValue = newValue else { return }
+          resultMap = newValue.resultMap
+        }
+      }
+
+      public struct AsStartEvent: GraphQLSelectionSet {
+        public static let possibleTypes: [String] = ["StartEvent"]
+
+        public static var selections: [GraphQLSelection] {
+          return [
+            GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
+            GraphQLField("type", type: .nonNull(.scalar(EventType.self))),
+            GraphQLField("payload", type: .nonNull(.list(.nonNull(.scalar(String.self))))),
+            GraphQLField("room", type: .nonNull(.object(Room.selections))),
+          ]
+        }
+
+        public private(set) var resultMap: ResultMap
+
+        public init(unsafeResultMap: ResultMap) {
+          self.resultMap = unsafeResultMap
+        }
+
+        public init(type: EventType, payload: [String], room: Room) {
+          self.init(unsafeResultMap: ["__typename": "StartEvent", "type": type, "payload": payload, "room": room.resultMap])
+        }
+
+        public var __typename: String {
+          get {
+            return resultMap["__typename"]! as! String
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "__typename")
+          }
+        }
+
+        public var type: EventType {
+          get {
+            return resultMap["type"]! as! EventType
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "type")
+          }
+        }
+
+        public var payload: [String] {
+          get {
+            return resultMap["payload"]! as! [String]
+          }
+          set {
+            resultMap.updateValue(newValue, forKey: "payload")
+          }
+        }
+
+        public var room: Room {
+          get {
+            return Room(unsafeResultMap: resultMap["room"]! as! ResultMap)
+          }
+          set {
+            resultMap.updateValue(newValue.resultMap, forKey: "room")
+          }
+        }
+
+        public struct Room: GraphQLSelectionSet {
+          public static let possibleTypes: [String] = ["Room"]
+
+          public static var selections: [GraphQLSelection] {
+            return [
+              GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
+              GraphQLField("players", type: .nonNull(.list(.nonNull(.object(Player.selections))))),
+            ]
+          }
+
+          public private(set) var resultMap: ResultMap
+
+          public init(unsafeResultMap: ResultMap) {
+            self.resultMap = unsafeResultMap
+          }
+
+          public init(players: [Player]) {
+            self.init(unsafeResultMap: ["__typename": "Room", "players": players.map { (value: Player) -> ResultMap in value.resultMap }])
+          }
+
+          public var __typename: String {
+            get {
+              return resultMap["__typename"]! as! String
+            }
+            set {
+              resultMap.updateValue(newValue, forKey: "__typename")
+            }
+          }
+
+          /// Players joined in this room
+          public var players: [Player] {
+            get {
+              return (resultMap["players"] as! [ResultMap]).map { (value: ResultMap) -> Player in Player(unsafeResultMap: value) }
+            }
+            set {
+              resultMap.updateValue(newValue.map { (value: Player) -> ResultMap in value.resultMap }, forKey: "players")
+            }
+          }
+
+          public struct Player: GraphQLSelectionSet {
+            public static let possibleTypes: [String] = ["Player"]
+
+            public static var selections: [GraphQLSelection] {
+              return [
+                GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
+                GraphQLField("username", type: .nonNull(.scalar(String.self))),
+              ]
+            }
+
+            public private(set) var resultMap: ResultMap
+
+            public init(unsafeResultMap: ResultMap) {
+              self.resultMap = unsafeResultMap
+            }
+
+            public init(username: String) {
+              self.init(unsafeResultMap: ["__typename": "Player", "username": username])
+            }
+
+            public var __typename: String {
+              get {
+                return resultMap["__typename"]! as! String
+              }
+              set {
+                resultMap.updateValue(newValue, forKey: "__typename")
+              }
+            }
+
+            /// Unique username
+            public var username: String {
+              get {
+                return resultMap["username"]! as! String
+              }
+              set {
+                resultMap.updateValue(newValue, forKey: "username")
+              }
+            }
           }
         }
       }

@@ -21,7 +21,7 @@ public struct MainView: View {
     
     /// Create Agent Mutation
     @StateObject
-    var createAgent = Orfeus.use(
+    var createAgent = Orfeus.agent(
         mutation: CreateRoomMutation.self
     )
     

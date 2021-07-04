@@ -169,6 +169,7 @@ extension Orfeus {
         fileprivate func assignData(datum: TMutation.Data, onSuccess: @escaping (TMutation.Data) -> Void) {
             withAnimation {
                 state = .succeed(datum)
+                Orfeus.shared.apollo.clearCache()
                 onSuccess(datum)
             }
         }
@@ -199,7 +200,7 @@ extension Orfeus {
     
     
     /// Use GraphQL Mutation Agent with a default mutation
-    public static func use<TMutation: GraphQLMutation>(
+    public static func agent<TMutation: GraphQLMutation>(
         mutation gql: TMutation.Type
     ) -> MutationAgent<TMutation> {
         MutationAgent(mutation: gql)

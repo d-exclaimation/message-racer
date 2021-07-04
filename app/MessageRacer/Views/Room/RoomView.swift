@@ -8,12 +8,13 @@
 import Foundation
 import SwiftUI
 
+
 public struct RoomView: View {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     
     @EnvironmentObject var user: User
     
-    let color: Color
+    let color: Color = Color(UIColor.mediumPurple)
     let uuid: UUID
     let navigate: (MainRoute) -> Void
     let timestamp: Date = Date()
@@ -44,6 +45,20 @@ public struct RoomView: View {
     var playerPos: Int = 0
     @State
     var wpm: Double = 0
+    
+    @StateObject
+    var gameCycle: Orfeus.StreamAgent<GameRoomSubscription, GameRoomSubscription.Data?>
+    
+    init(uuid id: UUID, navigate fn: @escaping (MainRoute) -> Void) {
+        uuid = id
+        navigate = fn
+        _gameCycle = StateObject(wrappedValue: Orfeus.agent(
+            stream: GameRoomSubscription(id: id.id),
+            initial: nil,
+            reducer: { _, curr in curr },
+            pause: false
+        ))
+    }
     
     public var body: some View {
         ZStack {
@@ -94,6 +109,10 @@ public struct RoomView: View {
                 navigate(.main)
             }
         }
+        .onStream(agent: gameCycle) { data in
+            // TODO: Play the game
+            print(data ?? "called")
+        }
     }
     
     private var background: some View {
@@ -127,9 +146,10 @@ public struct RoomView: View {
     }
 }
 
+
 struct RoomView_Preview: PreviewProvider {
     static var previews: some View {
-        RoomView(color: .init(UIColor.mediumPurple), uuid: UUID()) { _ in }
+        RoomView(uuid: UUID()) { _ in }
             .environmentObject(User())
     }
 }

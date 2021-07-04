@@ -6,15 +6,27 @@
 //
 
 import SwiftUI
+import Apollo
 
-struct OrfeusOnChange: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+struct OrfeusOnChange<TSubscription: GraphQLSubscription, StreamPayload>: ViewModifier {
+    @ObservedObject
+    var agent: Orfeus.StreamAgent<TSubscription, StreamPayload>
+    
+    let listener: (StreamPayload) -> Void
+    
+    public func body(content: Content) -> some View {
+        content
+            .onAppear {
+                agent.register(listener: listener)
+            }
     }
 }
 
-struct OrfeusOnChange_Previews: PreviewProvider {
-    static var previews: some View {
-        OrfeusOnChange()
+extension View {
+    public func onStream<TSubscription: GraphQLSubscription, StreamPayload>(
+        agent: Orfeus.StreamAgent<TSubscription, StreamPayload>,
+        perform listener: @escaping (StreamPayload) -> Void
+    ) -> some View {
+        modifier(OrfeusOnChange<TSubscription, StreamPayload>(agent: agent, listener: listener))
     }
 }

@@ -145,7 +145,7 @@ extension Orfeus {
 
     
     /// Use GraphQL Query Agent
-    public static func use<TQuery: GraphQLQuery>(
+    public static func agent<TQuery: GraphQLQuery>(
         query gql: TQuery,
         fallback fn: Optional<TQuery.Data> = nil,
         pause: Bool = false

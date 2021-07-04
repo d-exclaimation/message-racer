@@ -24,14 +24,14 @@ public struct LobbyView: View {
     
     /// Room Feed  Agent
     @StateObject
-    var roomAgent = Orfeus.use(
-        awaiting: AvailableRoomsQuery(),
+    var roomAgent = Orfeus.agent(
+        query: AvailableRoomsQuery(),
         fallback: AvailableRoomsQuery.Data(availableRooms: [])
     )
     
     /// Join Agent Mutation
     @StateObject
-    var joinAgent = Orfeus.use(
+    var joinAgent = Orfeus.agent(
         mutation: JoinRoomMutation.self
     )
     
@@ -47,6 +47,7 @@ public struct LobbyView: View {
                         ForEach(data.availableRooms) { room in
                             Button {
                                 roomID = room.id
+                                showForm = true
                             } label: {
                                 RoomPreview(room: room)
                             }
@@ -83,7 +84,8 @@ public struct LobbyView: View {
     }
     
     private func handleSuccess(data: JoinRoomMutation.Data) -> Void {
-        guard let roomID = UUID(uuidString: data.joinRoom.id) else { return }
+        guard let roomID = UUID(uuidString: roomID ?? "") else { return }
+        roomAgent.invalidate()
         navigate(.room(id: roomID))
     }
     
