@@ -1,8 +1,0 @@
-query AvailableRooms {
-  availableRooms(last: 20) {
-    id
-    players {
-      id
-    }
-  }
-}
