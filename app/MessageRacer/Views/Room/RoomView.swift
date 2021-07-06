@@ -10,54 +10,58 @@ import SwiftUI
 
 
 public struct RoomView: View {
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
-    
+    @Environment(\.colorScheme) var scheme: ColorScheme
     @EnvironmentObject var user: User
     
     let color: Color = Color(UIColor.mediumPurple)
     let uuid: UUID
     let navigate: (MainRoute) -> Void
-    let timestamp: Date = Date()
-    let textMessage: [(String, Bool)] = [
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-        "a",
-    ]
-        .map { ($0.uppercased(), Int.random(in: 0...2) != 1)  }
-        .reversed()
     
+    // Player state
     @State
     var input: String = ""
     @State
     var playerPos: Int = 0
     @State
-    var wpm: Double = 0
+    var messages: [TextMessage] = []
+ 
     
+    // Behind the scene state
+    @State
+    var lobby: [String: Int] = [:]
+    @State
+    var wpm: Double = 0
+    @State
+    var timestamp: Date = Date()
+    
+    @State
+    var winner: String? = nil
+   
     @StateObject
     var gameCycle: Orfeus.StreamAgent<GameRoomSubscription, GameRoomSubscription.Data?>
+
+    @StateObject
+    var deltaAgent = Orfeus.agent(mutation: SendDeltaMutation.self)
+    
+    var endTitle: String {
+        if let winner = winner {
+            return "Sadly, \(winner) won! You are texting on \(Int(wpm)) wpm"
+        }
+        if playerPos == messages.count {
+            return "Well done \(user.username)! \(Int(wpm)) wpm"
+        }
+        return "\(user.username)'s end of the line ..."
+    }
+
     
     init(uuid id: UUID, navigate fn: @escaping (MainRoute) -> Void) {
         uuid = id
         navigate = fn
-        _gameCycle = StateObject(wrappedValue: Orfeus.agent(
+        _gameCycle = Orfeus.wrapped(
             stream: GameRoomSubscription(id: id.id),
             initial: nil,
-            reducer: { _, curr in curr },
-            pause: false
-        ))
+            reducer: { _, curr in curr }
+        )
     }
     
     public var body: some View {
@@ -68,36 +72,50 @@ public struct RoomView: View {
                 ScrollViewReader { scrollProxy in
                     ScrollView {
                         // Text messages
-                        ForEach(textMessage.indices) { i in
-                            ChatMessage(content: textMessage[i].0, date: Date(), isUser: textMessage[i].1, user: textMessage[i].1 ? "user" : "friend", fontColor: i < playerPos ? Color.blue : nil)
+                        ForEach(messages) { message in
+                            ChatMessage(
+                                content: message.message,
+                                date: Date(),
+                                isUser: message.owner == user.username,
+                                user: message.owner,
+                                fontColor: message.id < playerPos ? Color.blue : nil
+                            )
                                 .flippedUpsideDown()
                                 .padding(.vertical, 10)
-                                .id(i)
+                                .id(message.id)
                         }
                         
                         // End of text message
-                        Text(playerPos == textMessage.count ? "Well done \(user.username)! \(Int(wpm)) wpm" : "\(user.username)'s end of the line ...")
+                        Text(endTitle)
                             .fontWeight(.thin)
                             .padding()
                             .flippedUpsideDown()
-                            .id(textMessage.count)
+                            .id(messages.count)
                     }
                     .flippedUpsideDown()
                     .padding()
                     
                     // Text Input
                     VStack {
-                        TextField("Start typing...", text: $input, onCommit:  {
-                            onSubmission(val: input, proxy: scrollProxy)
-                        })
-                            .onChange(of: input) { val in
-                                if let last = val.last, last == " " {
-                                    onSubmission(val: val, proxy: scrollProxy)
+                        HStack {
+                            TextField("Start typing...", text: $input, onCommit:  {
+                                onSubmission(val: input, proxy: scrollProxy)
+                            })
+                                .onChange(of: input) { val in
+                                    if let last = val.last, last == " " {
+                                        onSubmission(val: val, proxy: scrollProxy)
+                                    }
                                 }
+                            
+                            Button {
+                                onSubmission(val: input, proxy: scrollProxy)
+                            } label: {
+                                Text("🕊")
                             }
+                        }
                     }
                     .padding()
-                    .background(colorScheme == .dark ? Color.black : Color.white)
+                    .background(scheme == .dark ? Color.black : Color.white)
                     .cornerRadius(10)
                     .padding()
                     
@@ -109,9 +127,24 @@ public struct RoomView: View {
                 navigate(.main)
             }
         }
-        .onStream(agent: gameCycle) { data in
-            // TODO: Play the game
-            print(data ?? "called")
+        .onDataChange(agent: gameCycle) { data in
+            guard winner == nil else { return }
+            guard let data = data else { return }
+            
+            // Choose appropriate functions
+            switch data.gameCycle.union {
+            case .none: return
+            case .start(let room, let words): return onStart(room: room, words: words)
+            case .end(let winner): return onEnd(winner: winner)
+            case .delta(let username, let index, _): return onDelta(username: username, index: index)
+            }
+        }
+        .alert(item: $winner) { winner in
+            Alert(
+                title: Text("\(winner)"),
+                message: Text(endTitle),
+                dismissButton: .destructive(Text("leave")) { navigate(.main) }
+            )
         }
     }
     
@@ -122,13 +155,16 @@ public struct RoomView: View {
     }
     
     private func onSubmission(val: String, proxy: ScrollViewProxy) -> Void {
-        guard playerPos < textMessage.count else {
-            return
-        }
+        guard winner == nil else { return }
+        guard playerPos < messages.count else { return }
+        guard val.trimmingCharacters(in: .whitespacesAndNewlines) == messages[playerPos].message.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
         
-        guard val.trimmingCharacters(in: .whitespacesAndNewlines) == textMessage[playerPos].0 else {
-            return
-        }
+        deltaAgent.mutate(
+            variables: SendDeltaMutation(
+                id: uuid.id, username: user.username, index: playerPos, word: val.trimmingCharacters(in: .whitespacesAndNewlines)
+            ),
+            onCompleted: { _ in }
+        )
         
         withAnimation {
             input = ""
@@ -136,13 +172,62 @@ public struct RoomView: View {
             proxy.scrollTo(playerPos, anchor: .top)
         }
         
-        if (playerPos == textMessage.count) {
-            let end = Date()
-            let wordCount = Double(textMessage.flatMap { (content, _) in
-                content.split(separator: " ")
-            }.count)
-            wpm = wordCount / timestamp.distance(to: end) * 60.0
+    }
+    
+    func messageColor(message: TextMessage) -> Color? {
+        if message.id < playerPos { return .green }
+        let maxOthers = lobby.values.max() ?? 0
+        if message.id < maxOthers  {
+            let diff = maxOthers - message.id
+            if diff > 5 {
+                return .red
+            }
+            
+            if diff > 2 {
+                return .orange
+            }
+            return .yellow
         }
+        return nil
+    }
+    
+    // On Start event
+    private typealias Start = GameRoomSubscription.Data.GameCycle.AsStartEvent
+    private func onStart(room: Start.Room, words: [String]) {
+        guard lobby.isEmpty else { return }
+        timestamp = Date()
+        lobby = Dictionary(uniqueKeysWithValues:
+            room.players
+                .filter { $0.username != user.username }
+                .map { ($0.username, 0) }
+        )
+        messages = words
+            .enumerated()
+            .map { ($0, $1, Int.random(in: 0..<room.players.count)) }
+            .map { (i, word, j) in (i, word, room.players[j].username) }
+            .map { TextMessage(id: $0, message: $1, owner: $2) }
+    }
+    
+    // On Delta event
+    private func onDelta(username: String, index: Int) {
+        guard let _ = lobby[username] else { return }
+        guard username == user.username else { return }
+        lobby.updateValue(index, forKey: username)
+    }
+    
+    private func onEnd(winner player: String) {
+        winner = player
+        let end = Date()
+        let wordCount = Double(messages.flatMap {
+            $0.message.split(separator: " ")
+        }.count)
+        wpm = wordCount / timestamp.distance(to: end) * 60.0
+    }
+}
+
+extension String: Identifiable {
+    public var id: String {
+        self
     }
 }
 

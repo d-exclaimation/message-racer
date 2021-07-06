@@ -37,7 +37,7 @@ import Apollo
 /// ```
 public protocol SuspensingView {
     /// GraphQL Data
-    associatedtype Data: GraphQLSelectionSet
+    associatedtype Data
     /// Loading Fallback View
     associatedtype LoadingView: View
     /// Success Content View

@@ -10,7 +10,7 @@ import Foundation
 public enum GameEvent {
     case start(GameRoomSubscription.Data.GameCycle.AsStartEvent.Room, [String])
     case end(String)
-    case delta(String, Int, String)
+    case delta(username: String, index: Int, word: String)
     case none
 }
 
@@ -20,7 +20,7 @@ extension GameRoomSubscription.Data.GameCycle {
             return .start(start.room, start.payload)
         }
         if let delta = asDeltaEvent {
-            return .delta(delta.username, delta.index, delta.word)
+            return .delta(username: delta.username, index: delta.index, word: delta.word)
         }
         if let end = asEndEvent {
             return .end(end.winner)

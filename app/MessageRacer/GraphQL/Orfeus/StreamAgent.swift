@@ -66,7 +66,7 @@ extension Orfeus {
         ///     Text("No data")
         /// }
         /// ```
-        public var state: AgentState<StreamPayload> = .idle
+        public var state: AgentState<StreamPayload> = .idle 
         
         /// Network request cancellable request
         ///
@@ -109,7 +109,7 @@ extension Orfeus {
         }
         
         /// Register listener to perform side effects after data is given
-        public func register(listener: @escaping (StreamPayload) -> Void) -> Void {
+        public func sink(listener: @escaping (StreamPayload) -> Void) -> Void {
             listeners.append(listener)
         }
         
@@ -142,6 +142,9 @@ extension Orfeus {
         private let errorHandler: ErrorReducer
     
         private var listeners = [(StreamPayload) -> Void]()
+
+        // Use this for on change
+        public var changeRef = Date()
         
         /// Gettting the current payload
         private var payload: StreamPayload {
@@ -188,11 +191,12 @@ extension Orfeus {
         }
         
         fileprivate func handleSuccess(data: TSubscription.Data) -> Void {
+            changeRef = Date()
             withAnimation {
                 let newPayload = reducer(payload, data)
                 state = .succeed(newPayload)
-                for listener in listeners {
-                    listener(newPayload)
+                listeners.forEach { 
+                    listener in listener(newPayload) 
                 }
             }
         }
@@ -200,7 +204,6 @@ extension Orfeus {
         /// GraphQL Network Request
         fileprivate func request() -> Cancellable {
             state = .succeed(initialPayload)
-            print("a")
             return Orfeus.shared.subscribe(
                 subscription: subscription,
                 onSuccess: handleSuccess(data:),
@@ -232,5 +235,31 @@ extension Orfeus {
             onError: onError
         ).load()
     }
+
+    /// Use Wrapped GraphQL Subscription Agent
+    public static func wrapped<TSubscription: GraphQLSubscription, Payload>(
+        stream gql: TSubscription,
+        initial: Payload,
+        reducer: @escaping StreamAgent<TSubscription, Payload>.StreamReducer,
+        cancelOn: StreamAgent<TSubscription, Payload>.CancelTrigger = .destroy,
+        pause: Bool = false,
+        onError: @escaping StreamAgent<TSubscription, Payload>.ErrorReducer = { res, _ in res }
+    ) -> StateObject<StreamAgent<TSubscription, Payload>> {
+        StateObject(wrappedValue: pause 
+            ? StreamAgent(
+                subscription: gql,
+                initial: initial,
+                reducer: reducer,
+                cancelOn: cancelOn,
+                onError: onError) 
+            : StreamAgent(
+                subscription: gql,
+                initial: initial,
+                reducer: reducer,
+                cancelOn: cancelOn,
+                onError: onError).load()
+        )
+    }
+     
 }
 

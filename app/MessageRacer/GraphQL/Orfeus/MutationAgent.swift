@@ -10,7 +10,7 @@ import Apollo
 import SwiftUI
 
 extension Orfeus {
-    /// GraphQL Query Observable to manage Query State
+    /// GraphQL Mutation Observable to manage Mutation State
     ///
     /// Usage: Instansiate agent
     /// ```swift
@@ -121,7 +121,7 @@ extension Orfeus {
         /// someMutation.mutate(
         ///     variables: SomeGraphQLMutation,
         ///     onCompleted: { data in
-        ///          queryAgents.map { $0.invalidate() }
+        ///          queryAgents.forEach { $0.invalidate() }
         ///     }
         /// )
         /// ```
@@ -205,6 +205,14 @@ extension Orfeus {
     ) -> MutationAgent<TMutation> {
         MutationAgent(mutation: gql)
     }
+
+    /// Use Wrapped GraphQL Mutation Agent with a default mutation
+    public static func wrapped<TMutation: GraphQLMutation>(
+         mutation gql: TMutation.Type
+    ) -> StateObject<MutationAgent<TMutation>> {
+        StateObject(wrappedValue: MutationAgent(mutation: gql))
+    }
+     
 }
 
 public func log<T>(_ val: T) -> Void {

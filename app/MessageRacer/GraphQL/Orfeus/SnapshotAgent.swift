@@ -174,5 +174,12 @@ extension Orfeus {
     ) -> SnapshotAgent<TSubscription> {
         SnapshotAgent(subscription: gql)
     }
+
+     /// Use Wrapped GraphQL Subscription Agent
+    public static func wrapped<TSubscription: GraphQLSubscription>(
+        snapshot gql: TSubscription.Type
+    ) -> StateObject<SnapshotAgent<TSubscription>> {
+        StateObject(wrappedValue: SnapshotAgent(subscription: gql))
+    }
 }
 

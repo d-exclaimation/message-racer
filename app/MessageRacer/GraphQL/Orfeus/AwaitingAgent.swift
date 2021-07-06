@@ -182,5 +182,19 @@ extension Orfeus {
         ? AwaitingAgent<TQuery>(query: gql, fallback: fn, autoCancel: autoCancel)
         : AwaitingAgent<TQuery>(query: gql, fallback: fn, autoCancel: autoCancel).watch()
     }
+
+    /// Use Wrapped GraphQL Query Awaiting Agent
+    public static func wrapped<TQuery: GraphQLQuery>(
+        awaiting gql: TQuery,
+        fallback fn: Optional<TQuery.Data> = nil,
+        pause: Bool = false,
+        autoCancel: Bool = true
+    ) -> StateObject<AwaitingAgent<TQuery>> {
+        StateObject(wrappedValue: pause
+            ? AwaitingAgent<TQuery>(query: gql, fallback: fn, autoCancel: autoCancel)
+            : AwaitingAgent<TQuery>(query: gql, fallback: fn, autoCancel: autoCancel).watch()
+        )
+    }
+     
 }
 

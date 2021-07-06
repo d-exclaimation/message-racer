@@ -137,3 +137,4 @@ extension GraphQLError {
         self.init(["message": reason])
     }
 }
+

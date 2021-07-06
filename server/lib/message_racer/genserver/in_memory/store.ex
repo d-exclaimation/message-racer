@@ -276,5 +276,5 @@ defmodule MessageRacer.InMemory.Store do
     "Streamlined 3rd generation superstructure"
   ]
 
-  defp get_messages(), do: @data |> Enum.shuffle() |> Enum.slice(0..10)
+  defp get_messages(), do: @data |> Enum.shuffle() |> Enum.slice(0..9)
 end

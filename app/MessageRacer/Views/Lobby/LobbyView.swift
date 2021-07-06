@@ -51,6 +51,7 @@ public struct LobbyView: View {
                             } label: {
                                 RoomPreview(room: room)
                             }
+                            .disabled(room.players.count >= 4)
                         }
                     }
                 }

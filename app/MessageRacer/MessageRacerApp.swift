@@ -23,10 +23,11 @@ struct MessageRacerApp: App {
                     url: URL(string: Preferences.shared.websocket)!
                 )
             )
-
+            let store = ApolloStore()
+            let client = URLSessionClient()
             // Request Chain HTTP Network Transport
             let http = RequestChainNetworkTransport(
-                interceptorProvider: LegacyInterceptorProvider(store: ApolloStore()),
+                interceptorProvider: NetworkInterceptorProvider(store: store, client: client),
                 endpointURL: URL(string: Preferences.shared.api)!
             )
 
@@ -36,7 +37,7 @@ struct MessageRacerApp: App {
                 webSocketNetworkTransport: websocket
             )
 
-            return ApolloClient(networkTransport: splitNetwork, store: ApolloStore())
+            return ApolloClient(networkTransport: splitNetwork, store: store)
         }
     }
     

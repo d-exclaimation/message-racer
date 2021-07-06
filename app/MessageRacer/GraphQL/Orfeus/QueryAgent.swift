@@ -152,5 +152,18 @@ extension Orfeus {
     ) -> QueryAgent<TQuery> {
         pause ? QueryAgent<TQuery>(query: gql, fallback: fn) : QueryAgent<TQuery>(query: gql, fallback: fn).load()
     }
+
+    /// Use Wrapped GraphQL Query Agent
+    public static func wrapped<TQuery: GraphQLQuery>(
+        query gql: TQuery,
+        fallback fn: Optional<TQuery.Data> = nil,
+        pause: Bool = false
+    ) -> StateObject<QueryAgent<TQuery>> {
+        StateObject(wrappedValue: pause 
+            ? QueryAgent<TQuery>(query: gql, fallback: fn) 
+            : QueryAgent<TQuery>(query: gql, fallback: fn).load()
+        )
+    }
+     
 }
 

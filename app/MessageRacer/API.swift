@@ -913,3 +913,63 @@ public final class JoinRoomMutation: GraphQLMutation {
     }
   }
 }
+
+public final class SendDeltaMutation: GraphQLMutation {
+  /// The raw GraphQL definition of this operation.
+  public let operationDefinition: String =
+    """
+    mutation SendDelta($id: ID!, $username: String!, $index: Int!, $word: String!) {
+      sendDelta(
+        delta: {roomId: $id, username: $username, changes: {index: $index, word: $word}}
+      )
+    }
+    """
+
+  public let operationName: String = "SendDelta"
+
+  public var id: GraphQLID
+  public var username: String
+  public var index: Int
+  public var word: String
+
+  public init(id: GraphQLID, username: String, index: Int, word: String) {
+    self.id = id
+    self.username = username
+    self.index = index
+    self.word = word
+  }
+
+  public var variables: GraphQLMap? {
+    return ["id": id, "username": username, "index": index, "word": word]
+  }
+
+  public struct Data: GraphQLSelectionSet {
+    public static let possibleTypes: [String] = ["RootMutationType"]
+
+    public static var selections: [GraphQLSelection] {
+      return [
+        GraphQLField("sendDelta", arguments: ["delta": ["roomId": GraphQLVariable("id"), "username": GraphQLVariable("username"), "changes": ["index": GraphQLVariable("index"), "word": GraphQLVariable("word")]]], type: .scalar(Bool.self)),
+      ]
+    }
+
+    public private(set) var resultMap: ResultMap
+
+    public init(unsafeResultMap: ResultMap) {
+      self.resultMap = unsafeResultMap
+    }
+
+    public init(sendDelta: Bool? = nil) {
+      self.init(unsafeResultMap: ["__typename": "RootMutationType", "sendDelta": sendDelta])
+    }
+
+    /// Send delta event
+    public var sendDelta: Bool? {
+      get {
+        return resultMap["sendDelta"] as? Bool
+      }
+      set {
+        resultMap.updateValue(newValue, forKey: "sendDelta")
+      }
+    }
+  }
+}

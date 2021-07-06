@@ -47,7 +47,7 @@ import Apollo
 ///     Text("\(err.message)")
 /// }
 /// ```
-public struct OrfeusSuspense<Content, Fallback, Catcher, Data>: View, SuspensingView where Content: View, Fallback: View, Catcher: View, Data: GraphQLSelectionSet {
+public struct OrfeusSuspense<Content, Fallback, Catcher, Data>: View, SuspensingView where Content: View, Fallback: View, Catcher: View {
     public typealias Data = Data
     public typealias LoadingView = Fallback
     public typealias SuccessView = Content
@@ -96,7 +96,7 @@ public struct OrfeusSuspense<Content, Fallback, Catcher, Data>: View, Suspensing
     }
 }
 
-extension OrfeusSuspense where Fallback == EmptyView, Catcher == EmptyView, Content: View, Data: GraphQLSelectionSet {
+extension OrfeusSuspense where Fallback == EmptyView, Catcher == EmptyView, Content: View {
     public init(state data: Orfeus.AgentState<Data>, @ViewBuilder content child: @escaping (Data) -> Content) {
         state = data
         content = child
@@ -105,7 +105,7 @@ extension OrfeusSuspense where Fallback == EmptyView, Catcher == EmptyView, Cont
     }
 }
 
-extension OrfeusSuspense where Fallback == EmptyView, Catcher: View, Content: View, Data: GraphQLSelectionSet {
+extension OrfeusSuspense where Fallback == EmptyView, Catcher: View, Content: View {
     public init(
         state data: Orfeus.AgentState<Data>,
         catcher handler: @escaping (Orfeus.Fault) -> Catcher,
@@ -118,7 +118,7 @@ extension OrfeusSuspense where Fallback == EmptyView, Catcher: View, Content: Vi
     }
 }
 
-extension OrfeusSuspense where Catcher == EmptyView, Fallback: View, Content: View, Data: GraphQLSelectionSet {
+extension OrfeusSuspense where Catcher == EmptyView, Fallback: View, Content: View {
     public init(
         state data: Orfeus.AgentState<Data>,
         fallback fall: Fallback,

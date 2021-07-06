@@ -64,11 +64,7 @@ defmodule MessageRacerWeb.RoomResolver do
 
       config(fn
         %{room_id: room_id}, _ ->
-          IO.puts(room_id)
           {:ok, topic: room_id}
-
-        _, _ ->
-          {:ok, topic: "lobby"}
       end)
 
       resolve(&game_cycle/3)
@@ -81,9 +77,9 @@ defmodule MessageRacerWeb.RoomResolver do
   @spec send_changes(%{delta: map()}, Res.t()) :: Graph.returned(boolean())
   def send_changes(
         %{delta: %{changes: %{index: i, word: word}, room_id: id, username: username}},
-        %Res{context: %{user: %Player{username: playername}}}
-      )
-      when playername == username do
+        _res
+      ) do
+    IO.puts("Delta: #{i} for #{word}")
     # Check to InMemory State, to whether it is correct, fail or a winner is found
     case InMemory.validate(id, i, word) do
       # If pass, just broadcast / dispatch to all client
@@ -100,7 +96,7 @@ defmodule MessageRacerWeb.RoomResolver do
         with {:ok, uuid} <- Ecto.UUID.cast(id),
              {:ok, %Room{}} <- RoomMutations.clear_room(uuid) do
           Graph.dispatch(
-            %End{type: :end, winner: playername},
+            %End{type: :end, winner: username},
             game_cycle: id
           )
 
@@ -110,11 +106,13 @@ defmodule MessageRacerWeb.RoomResolver do
         end
 
       _ ->
+        IO.puts("Delta: didn't pass")
         false |> ok()
     end
   end
 
-  def send_changes(_args, _res), do: false |> ok()
+  def send_changes(_args, _res),
+    do: false |> tap(fn _ -> IO.puts("Delta: Session missing") end) |> ok()
 
   @doc """
   Game cycle subscriptions

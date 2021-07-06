@@ -25,8 +25,16 @@ public struct MainView: View {
         mutation: CreateRoomMutation.self
     )
     
+    @StateObject
+    var joinAgent = Orfeus.agent(
+        mutation: JoinRoomMutation.self
+    )
+    
     @State
     var showCreateMenuForm = false
+    
+    @State
+    var showJoinForm = false
     
     public var body: some View {
         ZStack {
@@ -36,7 +44,7 @@ public struct MainView: View {
             
             VStack {
                 Button {
-                    navigate(.room(id: UUID()))
+                    showJoinForm.toggle()
                 } label: {
                     buttonLabel(text: "Join a room", iconName: "gamecontroller.fill")
                 }
@@ -58,6 +66,12 @@ public struct MainView: View {
             ) {
                 UserInfoView(isShowing: $showCreateMenuForm, errorMessage: $errorMessage, isLoading: createAgent.isLoading, onSubmit: onFormSubmit)
             }
+//            .sheet(
+//                isPresented: $showJoinForm,
+//                onDismiss: { showJoinForm = false }
+//            ) {
+//                UserInfoView(isShowing: $showJoinForm, errorMessage: $errorMessage, isLoading: joinAgent.isLoading, onSubmit: onJoin)
+//            }
         }
     }
     
@@ -68,6 +82,13 @@ public struct MainView: View {
             onFailure: { errorMessage = $0.message }
         )
     }
+//
+//    private func onJoin(_ username: String) -> Void {
+//        joinAgent.mutate(
+//            variables: JoinRoomMutation(id: <#T##GraphQLID#>, username: <#T##String#>)
+//        )
+//    }
+//
     
     /// Handle creation success with joining room
     private func handleSuccess(data: CreateRoomMutation.Data) -> Void {
