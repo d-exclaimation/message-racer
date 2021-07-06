@@ -52,6 +52,7 @@
 		53DB3286268DBEFF006CE332 /* LobbyRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DB3285268DBEFF006CE332 /* LobbyRoom.swift */; };
 		53DB328D268DC4EF006CE332 /* Plist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53DB328C268DC4EF006CE332 /* Plist.swift */; };
 		53DB328F268DC67A006CE332 /* Preferences.plist in Resources */ = {isa = PBXBuildFile; fileRef = 53DB328E268DC67A006CE332 /* Preferences.plist */; };
+		53FF360726942660008D0897 /* JoinFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53FF360626942660008D0897 /* JoinFormView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -97,6 +98,7 @@
 		53DB3289268DC29B006CE332 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		53DB328C268DC4EF006CE332 /* Plist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plist.swift; sourceTree = "<group>"; };
 		53DB328E268DC67A006CE332 /* Preferences.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Preferences.plist; sourceTree = "<group>"; };
+		53FF360626942660008D0897 /* JoinFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinFormView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,6 +189,7 @@
 			isa = PBXGroup;
 			children = (
 				53AFC08A268F1B0700C60467 /* UserInfoView.swift */,
+				53FF360626942660008D0897 /* JoinFormView.swift */,
 			);
 			path = Form;
 			sourceTree = "<group>";
@@ -432,6 +435,7 @@
 				53AFC08B268F1B0700C60467 /* UserInfoView.swift in Sources */,
 				5397F33326917FDC005D1913 /* OrfeusSuspense.swift in Sources */,
 				537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */,
+				53FF360726942660008D0897 /* JoinFormView.swift in Sources */,
 				533310F92691DA4A008E59AE /* StreamAgent.swift in Sources */,
 				53B45E13267C84F5007BF7DE /* ContentView.swift in Sources */,
 				53DB327F268DA205006CE332 /* Orfeus.swift in Sources */,

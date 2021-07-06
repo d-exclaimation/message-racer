@@ -66,12 +66,12 @@ public struct MainView: View {
             ) {
                 UserInfoView(isShowing: $showCreateMenuForm, errorMessage: $errorMessage, isLoading: createAgent.isLoading, onSubmit: onFormSubmit)
             }
-//            .sheet(
-//                isPresented: $showJoinForm,
-//                onDismiss: { showJoinForm = false }
-//            ) {
-//                UserInfoView(isShowing: $showJoinForm, errorMessage: $errorMessage, isLoading: joinAgent.isLoading, onSubmit: onJoin)
-//            }
+            .sheet(
+                isPresented: $showJoinForm,
+                onDismiss: { showJoinForm = false }
+            ) {
+                JoinFormView(isShowing: $showJoinForm, errorMessage: $errorMessage, isLoading: joinAgent.isLoading, onSubmit: onJoin)
+            }
         }
     }
     
@@ -82,13 +82,14 @@ public struct MainView: View {
             onFailure: { errorMessage = $0.message }
         )
     }
-//
-//    private func onJoin(_ username: String) -> Void {
-//        joinAgent.mutate(
-//            variables: JoinRoomMutation(id: <#T##GraphQLID#>, username: <#T##String#>)
-//        )
-//    }
-//
+    
+    private func onJoin(_ id: GraphQLID, _ username: String) -> Void {
+        joinAgent.mutate(
+            variables: JoinRoomMutation(id: id, username: username),
+            onCompleted: { _ in createNewRoom(roomID: id, username: username) },
+            onFailure: { errorMessage = $0.message }
+        )
+    }
     
     /// Handle creation success with joining room
     private func handleSuccess(data: CreateRoomMutation.Data) -> Void {
@@ -117,6 +118,7 @@ public struct MainView: View {
     /// Create room callback for the form
     private func createNewRoom(roomID: GraphQLID, username: String) -> Void {
         showCreateMenuForm = false
+        showJoinForm = false
         user.login(username: username)
         navigate(.room(id: UUID(uuidString: roomID) ?? UUID()))
     }
