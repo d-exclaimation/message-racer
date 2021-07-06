@@ -1,0 +1,9 @@
+mutation SendDelta($id: ID!, $username: String!, $index: Int!, $word: String!) {
+  sendDelta(
+    delta: {
+      roomId: $id
+      username: $username
+      changes: { index: $index, word: $word }
+    }
+  )
+}

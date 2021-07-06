@@ -39,6 +39,7 @@
 		53B45E25267C9C16007BF7DE /* Index.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B45E24267C9C16007BF7DE /* Index.swift */; };
 		53B45E27267CB5C1007BF7DE /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B45E26267CB5C1007BF7DE /* User.swift */; };
 		53B45E2A267CB9D6007BF7DE /* NavView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B45E29267CB9D6007BF7DE /* NavView.swift */; };
+		53CF000726945FD300476E08 /* URLSession+Cookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53CF000626945FD300476E08 /* URLSession+Cookie.swift */; };
 		53D66C6D2691913E0005BB84 /* SuspensingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D66C6C2691913E0005BB84 /* SuspensingView.swift */; };
 		53DB3271268D9D67006CE332 /* Apollo in Frameworks */ = {isa = PBXBuildFile; productRef = 53DB3270268D9D67006CE332 /* Apollo */; };
 		53DB3273268D9D67006CE332 /* ApolloAPI in Frameworks */ = {isa = PBXBuildFile; productRef = 53DB3272268D9D67006CE332 /* ApolloAPI */; };
@@ -89,6 +90,7 @@
 		53B45E24267C9C16007BF7DE /* Index.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Index.swift; sourceTree = "<group>"; };
 		53B45E26267CB5C1007BF7DE /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		53B45E29267CB9D6007BF7DE /* NavView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavView.swift; sourceTree = "<group>"; };
+		53CF000626945FD300476E08 /* URLSession+Cookie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLSession+Cookie.swift"; sourceTree = "<group>"; };
 		53D66C6C2691913E0005BB84 /* SuspensingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuspensingView.swift; sourceTree = "<group>"; };
 		53DB327B268DA0B5006CE332 /* schema.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = schema.json; sourceTree = "<group>"; };
 		53DB327E268DA205006CE332 /* Orfeus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Orfeus.swift; sourceTree = "<group>"; };
@@ -278,6 +280,14 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
+		53CF000526945FBC00476E08 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				53CF000626945FD300476E08 /* URLSession+Cookie.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
 		53DB327D268DA1ED006CE332 /* GraphQL */ = {
 			isa = PBXGroup;
 			children = (
@@ -298,6 +308,7 @@
 		53DB328A268DC4D5006CE332 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				53CF000526945FBC00476E08 /* Networking */,
 				53DB328B268DC4DB006CE332 /* Environment */,
 			);
 			path = Utils;
@@ -436,6 +447,7 @@
 				5397F33326917FDC005D1913 /* OrfeusSuspense.swift in Sources */,
 				537D2074268B137C0093D6D8 /* RoomPreview.swift in Sources */,
 				53FF360726942660008D0897 /* JoinFormView.swift in Sources */,
+				53CF000726945FD300476E08 /* URLSession+Cookie.swift in Sources */,
 				533310F92691DA4A008E59AE /* StreamAgent.swift in Sources */,
 				53B45E13267C84F5007BF7DE /* ContentView.swift in Sources */,
 				53DB327F268DA205006CE332 /* Orfeus.swift in Sources */,

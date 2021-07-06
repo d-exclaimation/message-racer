@@ -21,14 +21,70 @@ struct NetworkInterceptorProvider: InterceptorProvider {
     }
     
     func interceptors<Operation: GraphQLOperation>(for operation: Operation) -> [ApolloInterceptor] {
-        return [
+        [
             MaxRetryInterceptor(),
             LegacyCacheReadInterceptor(store: self.store),
+            RequestLoggingInterceptor(),
             NetworkFetchInterceptor(client: self.client),
+            ResponseLoggingInterceptor(),
             ResponseCodeInterceptor(),
             LegacyParsingInterceptor(cacheKeyForObject: self.store.cacheKeyForObject),
             AutomaticPersistedQueryInterceptor(),
             LegacyCacheWriteInterceptor(store: self.store)
         ]
+    }
+}
+
+class RequestLoggingInterceptor: ApolloInterceptor {
+    
+    func interceptAsync<Operation: GraphQLOperation>(
+        chain: RequestChain,
+        request: HTTPRequest<Operation>,
+        response: HTTPResponse<Operation>?,
+        completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) {
+        
+        do {
+            print("\nRequest:")
+            let headers = try request.toURLRequest().allHTTPHeaderFields
+            print(headers ?? "")
+            print("\n")
+        } catch {
+            print("Unexpected error: \(error).")
+        }
+        chain.proceedAsync(request: request,
+                           response: response,
+                           completion: completion)
+    }
+}
+
+class ResponseLoggingInterceptor: ApolloInterceptor {
+    
+    enum ResponseLoggingError: Error {
+        case notYetReceived
+    }
+    
+    func interceptAsync<Operation: GraphQLOperation>(
+        chain: RequestChain,
+        request: HTTPRequest<Operation>,
+        response: HTTPResponse<Operation>?,
+        completion: @escaping (Result<GraphQLResult<Operation.Data>, Error>) -> Void) {
+        
+        defer {
+            // Even if we can't log, we still want to keep going.
+            chain.proceedAsync(request: request,
+                               response: response,
+                               completion: completion)
+        }
+        
+        guard let receivedResponse = response else {
+            chain.handleErrorAsync(ResponseLoggingError.notYetReceived,
+                                   request: request,
+                                   response: response,
+                                   completion: completion)
+            return
+        }
+        print("\nResponse:")
+        print(HTTPCookieStorage.shared.cookies ?? "")
+        print("\n")
     }
 }

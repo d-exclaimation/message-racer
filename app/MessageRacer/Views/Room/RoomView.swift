@@ -47,9 +47,10 @@ public struct RoomView: View {
         if let winner = winner {
             return "Sadly, \(winner) won! You are texting on \(Int(wpm)) wpm"
         }
-        if playerPos == messages.count {
+        if !messages.isEmpty && playerPos == messages.count {
             return "Well done \(user.username)! \(Int(wpm)) wpm"
         }
+        
         return "\(user.username)'s end of the line ..."
     }
 

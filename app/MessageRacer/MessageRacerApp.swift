@@ -13,10 +13,8 @@ import ApolloWebSocket
 struct MessageRacerApp: App {
     
     init() {
-        print("initialize")
         // Assign the network
         Orfeus.shared.createClient = {
-            print("created")
             // Websocket Transport
             let websocket = WebSocketTransport(
                 request: URLRequest(
@@ -24,10 +22,13 @@ struct MessageRacerApp: App {
                 )
             )
             let store = ApolloStore()
-            let client = URLSessionClient()
+            
             // Request Chain HTTP Network Transport
             let http = RequestChainNetworkTransport(
-                interceptorProvider: NetworkInterceptorProvider(store: store, client: client),
+                interceptorProvider: NetworkInterceptorProvider(
+                    store: store,
+                    client: URLSessionClient(sessionConfiguration: .cookie, callbackQueue: .main)
+                ),
                 endpointURL: URL(string: Preferences.shared.api)!
             )
 

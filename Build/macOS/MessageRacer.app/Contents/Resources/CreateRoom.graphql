@@ -1,0 +1,11 @@
+mutation CreateRoom($username: String!) {
+  createRoom(userInfo: { username: $username }) {
+    host {
+      id
+      username
+    }
+    room {
+      id
+    }
+  }
+}
