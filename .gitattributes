@@ -1,2 +1,3 @@
 app/MessageRacer/Models/ linguist-language=Elixir
 app/MessageRacer/API.swift linguist-language=Go
+app/MessageRacer/GraphQL/ linguist-language=Go
